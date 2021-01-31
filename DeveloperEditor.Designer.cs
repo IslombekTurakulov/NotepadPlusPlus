@@ -1,4 +1,7 @@
 ﻿
+using System.Windows.Forms;
+using FastColoredTextBoxNS;
+
 namespace NotepadPlusPlus
 {
     using System;
@@ -148,8 +151,7 @@ namespace NotepadPlusPlus
             this.nameAppLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.timerInterval = new System.Windows.Forms.Timer(this.components);
             this.panel1 = new System.Windows.Forms.Panel();
-            this.openedPagesLabel = new System.Windows.Forms.Label();
-            this.treeView1 = new System.Windows.Forms.TreeView();
+            this.documentMap1 = new FastColoredTextBoxNS.DocumentMap();
             this.mainMenu.SuspendLayout();
             this.toolButtons.SuspendLayout();
             this.contextOption.SuspendLayout();
@@ -548,26 +550,26 @@ namespace NotepadPlusPlus
             // blackThemeItem
             // 
             this.blackThemeItem.Name = "blackThemeItem";
-            this.blackThemeItem.Size = new System.Drawing.Size(180, 24);
+            this.blackThemeItem.Size = new System.Drawing.Size(122, 24);
             this.blackThemeItem.Text = "Black";
             this.blackThemeItem.Click += new System.EventHandler(this.BlackTheme_Click);
             // 
             // hackerThemeItem
             // 
             this.hackerThemeItem.Name = "hackerThemeItem";
-            this.hackerThemeItem.Size = new System.Drawing.Size(180, 24);
+            this.hackerThemeItem.Size = new System.Drawing.Size(122, 24);
             this.hackerThemeItem.Text = "Hacker";
             this.hackerThemeItem.Click += new System.EventHandler(this.HackerTheme_Click);
             // 
             // toolStripMenuItem4
             // 
             this.toolStripMenuItem4.Name = "toolStripMenuItem4";
-            this.toolStripMenuItem4.Size = new System.Drawing.Size(177, 6);
+            this.toolStripMenuItem4.Size = new System.Drawing.Size(119, 6);
             // 
             // defaultThemeitem
             // 
             this.defaultThemeitem.Name = "defaultThemeitem";
-            this.defaultThemeitem.Size = new System.Drawing.Size(180, 24);
+            this.defaultThemeitem.Size = new System.Drawing.Size(122, 24);
             this.defaultThemeitem.Text = "Default";
             this.defaultThemeitem.Click += new System.EventHandler(this.DefaultTheme_Click);
             // 
@@ -1009,7 +1011,7 @@ namespace NotepadPlusPlus
             this.tabOption.Location = new System.Drawing.Point(0, 52);
             this.tabOption.Name = "tabOption";
             this.tabOption.SelectedIndex = 0;
-            this.tabOption.Size = new System.Drawing.Size(670, 376);
+            this.tabOption.Size = new System.Drawing.Size(614, 376);
             this.tabOption.TabIndex = 5;
             this.tabOption.SelectedIndexChanged += new System.EventHandler(this.TabOption_SelectedIndexChanged);
             // 
@@ -1034,7 +1036,7 @@ namespace NotepadPlusPlus
             this.recentPages.Location = new System.Drawing.Point(4, 22);
             this.recentPages.Name = "recentPages";
             this.recentPages.Padding = new System.Windows.Forms.Padding(3);
-            this.recentPages.Size = new System.Drawing.Size(662, 350);
+            this.recentPages.Size = new System.Drawing.Size(606, 350);
             this.recentPages.TabIndex = 0;
             this.recentPages.Text = "Untitled";
             this.recentPages.UseVisualStyleBackColor = true;
@@ -1076,7 +1078,7 @@ namespace NotepadPlusPlus
             this.fcbTextBox.RightBracket2 = '}';
             this.fcbTextBox.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(255)))), ((int)(((byte)(69)))), ((int)(((byte)(0)))));
             this.fcbTextBox.ServiceColors = ((FastColoredTextBoxNS.ServiceColors)(resources.GetObject("fcbTextBox.ServiceColors")));
-            this.fcbTextBox.Size = new System.Drawing.Size(656, 344);
+            this.fcbTextBox.Size = new System.Drawing.Size(600, 344);
             this.fcbTextBox.TabIndex = 8;
             this.fcbTextBox.WideCaret = true;
             this.fcbTextBox.Zoom = 100;
@@ -1151,38 +1153,23 @@ namespace NotepadPlusPlus
             // 
             // panel1
             // 
-            this.panel1.Controls.Add(this.openedPagesLabel);
-            this.panel1.Controls.Add(this.treeView1);
+            this.panel1.Controls.Add(this.documentMap1);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Right;
-            this.panel1.Location = new System.Drawing.Point(670, 52);
+            this.panel1.Location = new System.Drawing.Point(614, 52);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(128, 376);
+            this.panel1.Size = new System.Drawing.Size(184, 376);
             this.panel1.TabIndex = 9;
             // 
-            // openedPagesLabel
+            // documentMap1
             // 
-            this.openedPagesLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.openedPagesLabel.AutoSize = true;
-            this.openedPagesLabel.BackColor = System.Drawing.Color.Silver;
-            this.openedPagesLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.25F);
-            this.openedPagesLabel.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.openedPagesLabel.Location = new System.Drawing.Point(16, 0);
-            this.openedPagesLabel.Name = "openedPagesLabel";
-            this.openedPagesLabel.Size = new System.Drawing.Size(100, 16);
-            this.openedPagesLabel.TabIndex = 1;
-            this.openedPagesLabel.Text = "Opened Pages";
-            // 
-            // treeView1
-            // 
-            this.treeView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.treeView1.Location = new System.Drawing.Point(3, 16);
-            this.treeView1.Name = "treeView1";
-            this.treeView1.Size = new System.Drawing.Size(125, 379);
-            this.treeView1.TabIndex = 0;
+            this.documentMap1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.documentMap1.ForeColor = System.Drawing.Color.Maroon;
+            this.documentMap1.Location = new System.Drawing.Point(0, 0);
+            this.documentMap1.Name = "documentMap1";
+            this.documentMap1.Size = new System.Drawing.Size(184, 376);
+            this.documentMap1.TabIndex = 2;
+            this.documentMap1.Target = null;
+            this.documentMap1.Text = "documentMap1";
             // 
             // DeveloperEditor
             // 
@@ -1211,7 +1198,6 @@ namespace NotepadPlusPlus
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1331,10 +1317,9 @@ namespace NotepadPlusPlus
         private System.Windows.Forms.ToolStripMenuItem DeleteToolStripMenu;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem10;
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Label openedPagesLabel;
-        private System.Windows.Forms.TreeView treeView1;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem12;
         private System.Windows.Forms.ToolStripMenuItem форматироватьToolStripMenuItem;
+        private FastColoredTextBoxNS.DocumentMap documentMap1;
     }
 }
 

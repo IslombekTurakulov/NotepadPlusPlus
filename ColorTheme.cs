@@ -37,7 +37,6 @@ namespace NotepadPlusPlus
             StatusStrip statusText,
             TabControl tabOption,
             FastColoredTextBox fastColoredTextBox,
-            TreeView treeView,
             Color backColor,
             Color foreColor)
         {

@@ -70,7 +70,10 @@ namespace NotepadPlusPlus
             // И тут идёт проверка , если внутри вкладки если текстбокс то присваивается.
             foreach (var c in tabpage.Controls)
                 if (c is FastColoredTextBox box)
+                {
+                    documentMap1.Target = box;
                     return box;
+                }
 
             return null;
         }
@@ -114,7 +117,6 @@ namespace NotepadPlusPlus
                 // Часто происходит, что после создания новой вкладки, первая вкладка очищается, вот и сделал тут условие.
                 this.tabOption.TabPages[0].Controls[0].Text = fastColoredTextBox.Text;
             }
-            this.UpdateDocumentSelectorList();
         }
 
 
@@ -222,8 +224,6 @@ namespace NotepadPlusPlus
                     this._openedFilesList.Add(this._filePath);
                     DataSaver();
                 }
-
-                this.UpdateDocumentSelectorList();
             }
             catch (Exception exception)
             {
@@ -253,7 +253,6 @@ namespace NotepadPlusPlus
 
                         // Добавляем в список путь файла
                         this._openedFilesList.Add(this._filePath);
-                        this.UpdateDocumentSelectorList();
                         DataSaver();
                     }
                 }
@@ -375,10 +374,10 @@ namespace NotepadPlusPlus
                         if (dg == DialogResult.Yes)
                         {
                             SaveFileDialog saveFileDialog1 = new SaveFileDialog
-                                                                 {
-                                                                     Filter =
+                            {
+                                Filter =
                                                                          @"Текстовый документ (*.txt)|*.txt|C# (*.cs)|*.cs|JavaScript (*.js)|*.js|HTML (*.html)|*.html|CSS (*.css)|*.css|RTF (*.rtf)|*.rtf|JSON (*.json)|*.json|PHP (*.php)|*.php|Doc (*.docx)|*.docx|Все файлы (*.)|*."
-                                                                 };
+                            };
 
                             if (!tabpage.Text.Contains("Untitled"))
                             {
@@ -405,8 +404,6 @@ namespace NotepadPlusPlus
                             tabOption.Select();
                         }
                     }
-
-                    this.UpdateDocumentSelectorList();
                 }
                 else
                 {
@@ -453,19 +450,18 @@ namespace NotepadPlusPlus
 
         private void SyntaxCsharp_Click(object sender, EventArgs e)
         {
-
-            if (this.tabOption.TabPages.Count >= 1)
+            try
             {
-                this.SelectedPageTextBox().Language = Language.CSharp;
-                this.SelectedPageTextBox().Text = @"using System;
-class Program
-{ 
-   static void Main(string[] args)
-   { 
-       Console.WriteLine(""Hello""); 
-       Console.ReadLine();
-   } 
-}";
+
+                if (this.tabOption.TabPages.Count >= 1)
+                {
+                    this.SelectedPageTextBox().Language = Language.CSharp;
+                    this.SelectedPageTextBox().Text = File.ReadAllText("CSharpExample.cs");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
             }
 
         }
@@ -534,7 +530,7 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
         private void BlackTheme_Click(object sender, EventArgs e)
         {
             ColorTheme colorTheme = new ColorTheme();
-            colorTheme.ColorChangerDeveloperForm(mainMenu, toolButtons, statusStrip1, tabOption, SelectedPageTextBox(), treeView1,Color.Black, Color.White);
+            colorTheme.ColorChangerDeveloperForm(mainMenu, toolButtons, statusStrip1, tabOption, SelectedPageTextBox(), Color.Black, Color.White);
             this.BackColor = Color.Black;
         }
 
@@ -543,7 +539,7 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
         private void HackerTheme_Click(object sender, EventArgs e)
         {
             ColorTheme colorTheme = new ColorTheme();
-            colorTheme.ColorChangerDeveloperForm(mainMenu, toolButtons, statusStrip1, tabOption, SelectedPageTextBox(), treeView1,Color.Black, Color.LawnGreen);
+            colorTheme.ColorChangerDeveloperForm(mainMenu, toolButtons, statusStrip1, tabOption, SelectedPageTextBox(), Color.Black, Color.LawnGreen);
             this.BackColor = Color.Black;
         }
 
@@ -551,7 +547,7 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
         private void DefaultTheme_Click(object sender, EventArgs e)
         {
             ColorTheme colorTheme = new ColorTheme();
-            colorTheme.ColorChangerDeveloperForm(mainMenu, toolButtons, statusStrip1, tabOption, SelectedPageTextBox(), treeView1,DefaultBackColor, DefaultForeColor);
+            colorTheme.ColorChangerDeveloperForm(mainMenu, toolButtons, statusStrip1, tabOption, SelectedPageTextBox(), DefaultBackColor, DefaultForeColor);
             this.BackColor = Color.Black;
         }
 
@@ -689,14 +685,11 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
                         if (tabpage.Text.Contains("Untitled"))
                         {
                             this.SaveFile_Click(sender, e);
-                                tabOption.TabPages.Remove(tabpage);
-                                this.TabOption_SelectedIndexChanged(sender, e);
+                            break;
                         }
-                        else
-                        {
-                            tabOption.TabPages.Remove(tabpage);
-                            this.TabOption_SelectedIndexChanged(sender, e);
-                        }
+
+                        tabOption.TabPages.Remove(tabpage);
+                        this.TabOption_SelectedIndexChanged(sender, e);
                     }
                 }
             }
@@ -720,25 +713,6 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
             this.timerInterval.Start();
         }
 
-        public void UpdateDocumentSelectorList()
-        {
-            TabControl.TabPageCollection tabPageCollection = this.tabOption.TabPages;
-            this.treeView1.Nodes.Clear();
-            foreach (TabPage tabPage in tabPageCollection)
-            {
-                string fname = tabPage.Text;
-                Color color;
-                if (fname.Contains("*"))
-                    fname = fname.Remove(fname.Length - 1);
-                if (fname.Contains("Untitled"))
-                    color = Color.FromArgb(245, 255, 245);
-                else
-                    color = Color.FromArgb(255, 250, 250);
-
-                TreeNode treeNode = new TreeNode { Text = fname, BackColor = color };
-                treeView1.Nodes.Add(treeNode);
-            }
-        }
 
         private void DeveloperEditor_Load(object sender, EventArgs e)
         {
@@ -836,9 +810,8 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
                     this.tabOption.SelectedTab = this.tabOption.TabPages[Math.Max(newIndex, 0)];
                 if (this._openedFilesList.Count != 1)
                     this._openedFilesList.RemoveAt(newIndex);
-                this.UpdateDocumentSelectorList();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
 
             }

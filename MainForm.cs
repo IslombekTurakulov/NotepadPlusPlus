@@ -59,7 +59,7 @@ namespace NotepadPlusPlus
                 if (_timeleft <= 0)
                 {
                     this.timerInterval.Stop();
-                    string path = $@"backup/BackupMainFormText {this._backupCount++}.txt";
+                    string path = $@"backup/BackupMainFormText {this._backupCount++}.rtf";
                     TabControl.TabPageCollection tabcoll = this.tabOption.TabPages;
                     TabPage tb = tabOption.SelectedTab;
 
