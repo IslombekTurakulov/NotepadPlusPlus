@@ -130,15 +130,13 @@ namespace NotepadPlusPlus
             this.selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.selectContextMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.cutContextMenu = new System.Windows.Forms.ToolStripMenuItem();
-            this.redoContexMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.undoContextMenu = new System.Windows.Forms.ToolStripMenuItem();
+            this.redoContexMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripMenuItem11 = new System.Windows.Forms.ToolStripMenuItem();
             this.tabOption = new System.Windows.Forms.TabControl();
             this.contextTabMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.recentPages = new System.Windows.Forms.TabPage();
-            this.fcbTextBox = new FastColoredTextBoxNS.FastColoredTextBox();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.fileStatusStrip = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel4 = new System.Windows.Forms.ToolStripStatusLabel();
@@ -150,14 +148,11 @@ namespace NotepadPlusPlus
             this.nameAppLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.timerInterval = new System.Windows.Forms.Timer(this.components);
             this.panel1 = new System.Windows.Forms.Panel();
-            this.documentMap1 = new FastColoredTextBoxNS.DocumentMap();
+            this.documentMap = new FastColoredTextBoxNS.DocumentMap();
             this.mainMenu.SuspendLayout();
             this.toolButtons.SuspendLayout();
             this.contextOption.SuspendLayout();
-            this.tabOption.SuspendLayout();
             this.contextTabMenuStrip.SuspendLayout();
-            this.recentPages.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.fcbTextBox)).BeginInit();
             this.statusStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -549,27 +544,27 @@ namespace NotepadPlusPlus
             // blackThemeItem
             // 
             this.blackThemeItem.Name = "blackThemeItem";
-            this.blackThemeItem.Size = new System.Drawing.Size(122, 24);
-            this.blackThemeItem.Text = "Black";
+            this.blackThemeItem.Size = new System.Drawing.Size(144, 24);
+            this.blackThemeItem.Text = "Тёмный";
             this.blackThemeItem.Click += new System.EventHandler(this.BlackTheme_Click);
             // 
             // hackerThemeItem
             // 
             this.hackerThemeItem.Name = "hackerThemeItem";
-            this.hackerThemeItem.Size = new System.Drawing.Size(122, 24);
-            this.hackerThemeItem.Text = "Hacker";
+            this.hackerThemeItem.Size = new System.Drawing.Size(144, 24);
+            this.hackerThemeItem.Text = "Хакер гыы";
             this.hackerThemeItem.Click += new System.EventHandler(this.HackerTheme_Click);
             // 
             // toolStripMenuItem4
             // 
             this.toolStripMenuItem4.Name = "toolStripMenuItem4";
-            this.toolStripMenuItem4.Size = new System.Drawing.Size(119, 6);
+            this.toolStripMenuItem4.Size = new System.Drawing.Size(141, 6);
             // 
             // defaultThemeitem
             // 
             this.defaultThemeitem.Name = "defaultThemeitem";
-            this.defaultThemeitem.Size = new System.Drawing.Size(122, 24);
-            this.defaultThemeitem.Text = "Default";
+            this.defaultThemeitem.Size = new System.Drawing.Size(144, 24);
+            this.defaultThemeitem.Text = "Светлое";
             this.defaultThemeitem.Click += new System.EventHandler(this.DefaultTheme_Click);
             // 
             // toolStripMenuItem8
@@ -635,7 +630,7 @@ namespace NotepadPlusPlus
             // 
             this.csharpMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("csharpMenuItem.Image")));
             this.csharpMenuItem.Name = "csharpMenuItem";
-            this.csharpMenuItem.Size = new System.Drawing.Size(141, 24);
+            this.csharpMenuItem.Size = new System.Drawing.Size(180, 24);
             this.csharpMenuItem.Text = "C#";
             this.csharpMenuItem.Click += new System.EventHandler(this.SyntaxCsharp_Click);
             // 
@@ -643,7 +638,7 @@ namespace NotepadPlusPlus
             // 
             this.htmlMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("htmlMenuItem.Image")));
             this.htmlMenuItem.Name = "htmlMenuItem";
-            this.htmlMenuItem.Size = new System.Drawing.Size(141, 24);
+            this.htmlMenuItem.Size = new System.Drawing.Size(180, 24);
             this.htmlMenuItem.Text = "HTML";
             this.htmlMenuItem.Click += new System.EventHandler(this.SyntaxHTML_Click);
             // 
@@ -651,7 +646,7 @@ namespace NotepadPlusPlus
             // 
             this.xmlMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("xmlMenuItem.Image")));
             this.xmlMenuItem.Name = "xmlMenuItem";
-            this.xmlMenuItem.Size = new System.Drawing.Size(141, 24);
+            this.xmlMenuItem.Size = new System.Drawing.Size(180, 24);
             this.xmlMenuItem.Text = "XML";
             this.xmlMenuItem.Click += new System.EventHandler(this.SyntaxXML_Click);
             // 
@@ -659,7 +654,7 @@ namespace NotepadPlusPlus
             // 
             this.jsMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("jsMenuItem.Image")));
             this.jsMenuItem.Name = "jsMenuItem";
-            this.jsMenuItem.Size = new System.Drawing.Size(141, 24);
+            this.jsMenuItem.Size = new System.Drawing.Size(180, 24);
             this.jsMenuItem.Text = "JS";
             this.jsMenuItem.Click += new System.EventHandler(this.SyntaxJS_Click);
             // 
@@ -667,7 +662,7 @@ namespace NotepadPlusPlus
             // 
             this.JsonMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("JsonMenuItem.Image")));
             this.JsonMenuItem.Name = "JsonMenuItem";
-            this.JsonMenuItem.Size = new System.Drawing.Size(141, 24);
+            this.JsonMenuItem.Size = new System.Drawing.Size(180, 24);
             this.JsonMenuItem.Text = "JSON";
             this.JsonMenuItem.Click += new System.EventHandler(this.JsonMenuItem_Click);
             // 
@@ -675,7 +670,7 @@ namespace NotepadPlusPlus
             // 
             this.PhpMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("PhpMenuItem.Image")));
             this.PhpMenuItem.Name = "PhpMenuItem";
-            this.PhpMenuItem.Size = new System.Drawing.Size(141, 24);
+            this.PhpMenuItem.Size = new System.Drawing.Size(180, 24);
             this.PhpMenuItem.Text = "PHP";
             this.PhpMenuItem.Click += new System.EventHandler(this.PhpMenuItem_Click);
             // 
@@ -683,19 +678,19 @@ namespace NotepadPlusPlus
             // 
             this.SyntaxPython.Image = global::NotepadPlusPlus.Properties.Resources.DcHj7iYW0AAWrgo;
             this.SyntaxPython.Name = "SyntaxPython";
-            this.SyntaxPython.Size = new System.Drawing.Size(141, 24);
+            this.SyntaxPython.Size = new System.Drawing.Size(180, 24);
             this.SyntaxPython.Text = "Python";
             this.SyntaxPython.Click += new System.EventHandler(this.SyntaxPython_Click);
             // 
             // separatorForSyntax
             // 
             this.separatorForSyntax.Name = "separatorForSyntax";
-            this.separatorForSyntax.Size = new System.Drawing.Size(138, 6);
+            this.separatorForSyntax.Size = new System.Drawing.Size(177, 6);
             // 
             // defaultToolStripMenuItem
             // 
             this.defaultToolStripMenuItem.Name = "defaultToolStripMenuItem";
-            this.defaultToolStripMenuItem.Size = new System.Drawing.Size(141, 24);
+            this.defaultToolStripMenuItem.Size = new System.Drawing.Size(180, 24);
             this.defaultToolStripMenuItem.Text = "Обычный";
             this.defaultToolStripMenuItem.Click += new System.EventHandler(this.SyntaxDefault_Click);
             // 
@@ -929,92 +924,90 @@ namespace NotepadPlusPlus
             this.selectAllToolStripMenuItem,
             this.selectContextMenu,
             this.cutContextMenu,
-            this.redoContexMenu,
             this.undoContextMenu,
+            this.redoContexMenu,
             this.toolStripSeparator5,
             this.toolStripMenuItem11});
             this.contextOption.Name = "contextMenuStrip1";
-            this.contextOption.Size = new System.Drawing.Size(123, 186);
+            this.contextOption.Size = new System.Drawing.Size(150, 186);
             // 
             // copyToolStripMenuItem1
             // 
             this.copyToolStripMenuItem1.Image = ((System.Drawing.Image)(resources.GetObject("copyToolStripMenuItem1.Image")));
             this.copyToolStripMenuItem1.Name = "copyToolStripMenuItem1";
-            this.copyToolStripMenuItem1.Size = new System.Drawing.Size(122, 22);
-            this.copyToolStripMenuItem1.Text = "Copy";
+            this.copyToolStripMenuItem1.Size = new System.Drawing.Size(149, 22);
+            this.copyToolStripMenuItem1.Text = "Копировать";
             this.copyToolStripMenuItem1.Click += new System.EventHandler(this.CopyMenu_Click);
             // 
             // pasteToolStripMenuItem1
             // 
             this.pasteToolStripMenuItem1.Image = ((System.Drawing.Image)(resources.GetObject("pasteToolStripMenuItem1.Image")));
             this.pasteToolStripMenuItem1.Name = "pasteToolStripMenuItem1";
-            this.pasteToolStripMenuItem1.Size = new System.Drawing.Size(122, 22);
-            this.pasteToolStripMenuItem1.Text = "Paste";
+            this.pasteToolStripMenuItem1.Size = new System.Drawing.Size(149, 22);
+            this.pasteToolStripMenuItem1.Text = "Вставить";
             this.pasteToolStripMenuItem1.Click += new System.EventHandler(this.PasteMenu_Click);
             // 
             // selectAllToolStripMenuItem
             // 
             this.selectAllToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("selectAllToolStripMenuItem.Image")));
             this.selectAllToolStripMenuItem.Name = "selectAllToolStripMenuItem";
-            this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
-            this.selectAllToolStripMenuItem.Text = "Select All";
+            this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.selectAllToolStripMenuItem.Text = "Выделить Всё";
             this.selectAllToolStripMenuItem.Click += new System.EventHandler(this.SelectAllMenu_Click);
             // 
             // selectContextMenu
             // 
             this.selectContextMenu.Name = "selectContextMenu";
-            this.selectContextMenu.Size = new System.Drawing.Size(122, 22);
-            this.selectContextMenu.Text = "Select";
+            this.selectContextMenu.Size = new System.Drawing.Size(149, 22);
+            this.selectContextMenu.Text = "Выделить";
             this.selectContextMenu.Click += new System.EventHandler(this.SelectContextMenu_Click);
             // 
             // cutContextMenu
             // 
             this.cutContextMenu.Image = ((System.Drawing.Image)(resources.GetObject("cutContextMenu.Image")));
             this.cutContextMenu.Name = "cutContextMenu";
-            this.cutContextMenu.Size = new System.Drawing.Size(122, 22);
-            this.cutContextMenu.Text = "Cut";
+            this.cutContextMenu.Size = new System.Drawing.Size(149, 22);
+            this.cutContextMenu.Text = "Вырезать";
             this.cutContextMenu.Click += new System.EventHandler(this.CutContextMenu_Click);
-            // 
-            // redoContexMenu
-            // 
-            this.redoContexMenu.Image = ((System.Drawing.Image)(resources.GetObject("redoContexMenu.Image")));
-            this.redoContexMenu.Name = "redoContexMenu";
-            this.redoContexMenu.Size = new System.Drawing.Size(122, 22);
-            this.redoContexMenu.Text = "Redo";
-            this.redoContexMenu.Click += new System.EventHandler(this.RedoContextMenu_Click);
             // 
             // undoContextMenu
             // 
             this.undoContextMenu.Image = ((System.Drawing.Image)(resources.GetObject("undoContextMenu.Image")));
             this.undoContextMenu.Name = "undoContextMenu";
-            this.undoContextMenu.Size = new System.Drawing.Size(122, 22);
-            this.undoContextMenu.Text = "Undo";
+            this.undoContextMenu.Size = new System.Drawing.Size(149, 22);
+            this.undoContextMenu.Text = "Отмена";
             this.undoContextMenu.Click += new System.EventHandler(this.UndoContextMenu_Click);
+            // 
+            // redoContexMenu
+            // 
+            this.redoContexMenu.Image = ((System.Drawing.Image)(resources.GetObject("redoContexMenu.Image")));
+            this.redoContexMenu.Name = "redoContexMenu";
+            this.redoContexMenu.Size = new System.Drawing.Size(149, 22);
+            this.redoContexMenu.Text = "Вернуть";
+            this.redoContexMenu.Click += new System.EventHandler(this.RedoContextMenu_Click);
             // 
             // toolStripSeparator5
             // 
             this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(119, 6);
+            this.toolStripSeparator5.Size = new System.Drawing.Size(146, 6);
             // 
             // toolStripMenuItem11
             // 
             this.toolStripMenuItem11.Image = ((System.Drawing.Image)(resources.GetObject("toolStripMenuItem11.Image")));
             this.toolStripMenuItem11.Name = "toolStripMenuItem11";
-            this.toolStripMenuItem11.Size = new System.Drawing.Size(122, 22);
-            this.toolStripMenuItem11.Text = "Delete";
+            this.toolStripMenuItem11.Size = new System.Drawing.Size(149, 22);
+            this.toolStripMenuItem11.Text = "Удалить";
             this.toolStripMenuItem11.Click += new System.EventHandler(this.DeleteToolStripMenu_Click);
             // 
             // tabOption
             // 
             this.tabOption.ContextMenuStrip = this.contextTabMenuStrip;
-            this.tabOption.Controls.Add(this.recentPages);
             this.tabOption.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabOption.Location = new System.Drawing.Point(0, 52);
             this.tabOption.Name = "tabOption";
             this.tabOption.SelectedIndex = 0;
-            this.tabOption.Size = new System.Drawing.Size(608, 376);
+            this.tabOption.Size = new System.Drawing.Size(670, 376);
             this.tabOption.TabIndex = 5;
-            this.tabOption.SelectedIndexChanged += new System.EventHandler(this.TabOption_SelectedIndexChanged);
             // 
             // contextTabMenuStrip
             // 
@@ -1029,61 +1022,6 @@ namespace NotepadPlusPlus
             this.deleteToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
             this.deleteToolStripMenuItem.Text = "Delete";
             this.deleteToolStripMenuItem.Click += new System.EventHandler(this.DeleteToolStripMenuItem_Click);
-            // 
-            // recentPages
-            // 
-            this.recentPages.Controls.Add(this.fcbTextBox);
-            this.recentPages.Cursor = System.Windows.Forms.Cursors.Default;
-            this.recentPages.Location = new System.Drawing.Point(4, 22);
-            this.recentPages.Name = "recentPages";
-            this.recentPages.Padding = new System.Windows.Forms.Padding(3);
-            this.recentPages.Size = new System.Drawing.Size(600, 350);
-            this.recentPages.TabIndex = 0;
-            this.recentPages.Text = "Untitled";
-            this.recentPages.UseVisualStyleBackColor = true;
-            // 
-            // fcbTextBox
-            // 
-            this.fcbTextBox.AutoCompleteBracketsList = new char[] {
-        '(',
-        ')',
-        '{',
-        '}',
-        '[',
-        ']',
-        '\"',
-        '\"',
-        '\'',
-        '\''};
-            this.fcbTextBox.AutoIndentCharsPatterns = "\r\n^\\s*[\\w\\.]+(\\s\\w+)?\\s*(?<range>=)\\s*(?<range>[^;=]+);\r\n^\\s*(case|default)\\s*[^:" +
-    "]*(?<range>:)\\s*(?<range>[^;]+);\r\n";
-            this.fcbTextBox.AutoScrollMinSize = new System.Drawing.Size(27, 14);
-            this.fcbTextBox.BackBrush = null;
-            this.fcbTextBox.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.fcbTextBox.BracketsHighlightStrategy = FastColoredTextBoxNS.BracketsHighlightStrategy.Strategy2;
-            this.fcbTextBox.CharHeight = 14;
-            this.fcbTextBox.CharWidth = 8;
-            this.fcbTextBox.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.fcbTextBox.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
-            this.fcbTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.fcbTextBox.FindEndOfFoldingBlockStrategy = FastColoredTextBoxNS.FindEndOfFoldingBlockStrategy.Strategy2;
-            this.fcbTextBox.HighlightingRangeType = FastColoredTextBoxNS.HighlightingRangeType.AllTextRange;
-            this.fcbTextBox.IsReplaceMode = false;
-            this.fcbTextBox.Language = FastColoredTextBoxNS.Language.CSharp;
-            this.fcbTextBox.LeftBracket = '(';
-            this.fcbTextBox.LeftBracket2 = '{';
-            this.fcbTextBox.Location = new System.Drawing.Point(3, 3);
-            this.fcbTextBox.Name = "fcbTextBox";
-            this.fcbTextBox.Paddings = new System.Windows.Forms.Padding(0);
-            this.fcbTextBox.RightBracket = ')';
-            this.fcbTextBox.RightBracket2 = '}';
-            this.fcbTextBox.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(255)))), ((int)(((byte)(69)))), ((int)(((byte)(0)))));
-            this.fcbTextBox.ServiceColors = ((FastColoredTextBoxNS.ServiceColors)(resources.GetObject("fcbTextBox.ServiceColors")));
-            this.fcbTextBox.Size = new System.Drawing.Size(594, 344);
-            this.fcbTextBox.TabIndex = 8;
-            this.fcbTextBox.WideCaret = true;
-            this.fcbTextBox.Zoom = 100;
-            this.fcbTextBox.TextChanged += new System.EventHandler<FastColoredTextBoxNS.TextChangedEventArgs>(this.FcbTextBox_TextChanged);
             // 
             // statusStrip1
             // 
@@ -1154,23 +1092,23 @@ namespace NotepadPlusPlus
             // 
             // panel1
             // 
-            this.panel1.Controls.Add(this.documentMap1);
+            this.panel1.Controls.Add(this.documentMap);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Right;
-            this.panel1.Location = new System.Drawing.Point(608, 52);
+            this.panel1.Location = new System.Drawing.Point(670, 52);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(190, 376);
+            this.panel1.Size = new System.Drawing.Size(128, 376);
             this.panel1.TabIndex = 9;
             // 
-            // documentMap1
+            // documentMap
             // 
-            this.documentMap1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.documentMap1.ForeColor = System.Drawing.Color.Maroon;
-            this.documentMap1.Location = new System.Drawing.Point(0, 0);
-            this.documentMap1.Name = "documentMap1";
-            this.documentMap1.Size = new System.Drawing.Size(190, 376);
-            this.documentMap1.TabIndex = 2;
-            this.documentMap1.Target = null;
-            this.documentMap1.Text = "documentMap1";
+            this.documentMap.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.documentMap.ForeColor = System.Drawing.Color.Maroon;
+            this.documentMap.Location = new System.Drawing.Point(0, 0);
+            this.documentMap.Name = "documentMap";
+            this.documentMap.Size = new System.Drawing.Size(128, 376);
+            this.documentMap.TabIndex = 2;
+            this.documentMap.Target = null;
+            this.documentMap.Text = "documentMap";
             // 
             // DeveloperEditor
             // 
@@ -1192,10 +1130,7 @@ namespace NotepadPlusPlus
             this.toolButtons.ResumeLayout(false);
             this.toolButtons.PerformLayout();
             this.contextOption.ResumeLayout(false);
-            this.tabOption.ResumeLayout(false);
             this.contextTabMenuStrip.ResumeLayout(false);
-            this.recentPages.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.fcbTextBox)).EndInit();
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this.panel1.ResumeLayout(false);
@@ -1271,8 +1206,6 @@ namespace NotepadPlusPlus
         private ToolStripStatusLabel rowsInfo;
         private ToolStripStatusLabel nameAppLabel;
         private ToolStripMenuItem foreColorTheme;
-        private FastColoredTextBox fcbTextBox;
-        private TabPage recentPages;
         private ToolStripSeparator toolStripMenuItem2;
         private ToolStripMenuItem textAlignToolStripMenuItem;
         private ToolStripMenuItem leftSideToolStripMenuItem;
@@ -1320,7 +1253,7 @@ namespace NotepadPlusPlus
         private Panel panel1;
         private ToolStripSeparator toolStripMenuItem12;
         private ToolStripMenuItem форматироватьToolStripMenuItem;
-        private DocumentMap documentMap1;
+        private DocumentMap documentMap;
     }
 }
 

@@ -45,6 +45,7 @@ namespace NotepadPlusPlus
             this.saveAsToolItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveToolItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveIntervalMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.fourthToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.firstToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.secondToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.thirdToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -90,8 +91,8 @@ namespace NotepadPlusPlus
             this.csharpEditor = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem13 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripMenuItem();
-            this.wikipediaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem12 = new System.Windows.Forms.ToolStripSeparator();
+            this.aboutPanel = new System.Windows.Forms.ToolStripMenuItem();
             this.fastToolButton = new System.Windows.Forms.ToolStrip();
             this.NewButton = new System.Windows.Forms.ToolStripButton();
             this.OpenButton = new System.Windows.Forms.ToolStripButton();
@@ -141,10 +142,9 @@ namespace NotepadPlusPlus
             this.deleteToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1 = new System.Windows.Forms.Panel();
             this.openedPagesLabel = new System.Windows.Forms.Label();
-            this.treeView1 = new System.Windows.Forms.TreeView();
+            this.TreeView = new System.Windows.Forms.TreeView();
             this.timerInterval = new System.Windows.Forms.Timer(this.components);
             this.printDialog = new System.Windows.Forms.PrintDialog();
-            this.aboutPanel = new System.Windows.Forms.ToolStripMenuItem();
             this.mainMenu.SuspendLayout();
             this.fastToolButton.SuspendLayout();
             this.contextOption.SuspendLayout();
@@ -237,6 +237,7 @@ namespace NotepadPlusPlus
             // 
             this.saveIntervalMenuItem.AccessibleDescription = "";
             this.saveIntervalMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.fourthToolStripMenuItem,
             this.firstToolStripMenuItem,
             this.secondToolStripMenuItem,
             this.thirdToolStripMenuItem,
@@ -247,6 +248,13 @@ namespace NotepadPlusPlus
             this.saveIntervalMenuItem.ShortcutKeyDisplayString = "ON";
             this.saveIntervalMenuItem.Size = new System.Drawing.Size(255, 24);
             this.saveIntervalMenuItem.Text = "Автосохранение";
+            // 
+            // fourthToolStripMenuItem
+            // 
+            this.fourthToolStripMenuItem.Name = "fourthToolStripMenuItem";
+            this.fourthToolStripMenuItem.Size = new System.Drawing.Size(149, 24);
+            this.fourthToolStripMenuItem.Text = "1 минуту";
+            this.fourthToolStripMenuItem.Click += new System.EventHandler(this.FourthToolStripMenuItem_Click);
             // 
             // firstToolStripMenuItem
             // 
@@ -537,14 +545,14 @@ namespace NotepadPlusPlus
             // 
             this.blackThemeItem.Name = "blackThemeItem";
             this.blackThemeItem.Size = new System.Drawing.Size(170, 24);
-            this.blackThemeItem.Text = "Black";
+            this.blackThemeItem.Text = "Тёмный";
             this.blackThemeItem.Click += new System.EventHandler(this.BlackTheme_Click);
             // 
             // hackerThemeItem
             // 
             this.hackerThemeItem.Name = "hackerThemeItem";
             this.hackerThemeItem.Size = new System.Drawing.Size(170, 24);
-            this.hackerThemeItem.Text = "Hacker";
+            this.hackerThemeItem.Text = "Хакер ";
             this.hackerThemeItem.Click += new System.EventHandler(this.HackerTheme_Click);
             // 
             // toolStripMenuItem4
@@ -610,24 +618,24 @@ namespace NotepadPlusPlus
             // toolStripMenuItem5
             // 
             this.toolStripMenuItem5.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.wikipediaToolStripMenuItem,
             this.toolStripMenuItem12,
             this.aboutPanel});
             this.toolStripMenuItem5.Name = "toolStripMenuItem5";
             this.toolStripMenuItem5.Size = new System.Drawing.Size(27, 23);
             this.toolStripMenuItem5.Text = "?";
             // 
-            // wikipediaToolStripMenuItem
-            // 
-            this.wikipediaToolStripMenuItem.Name = "wikipediaToolStripMenuItem";
-            this.wikipediaToolStripMenuItem.Size = new System.Drawing.Size(188, 24);
-            this.wikipediaToolStripMenuItem.Text = "Wikipedia";
-            this.wikipediaToolStripMenuItem.Click += new System.EventHandler(this.WikipediaToolStripMenuItem_Click);
-            // 
             // toolStripMenuItem12
             // 
             this.toolStripMenuItem12.Name = "toolStripMenuItem12";
             this.toolStripMenuItem12.Size = new System.Drawing.Size(185, 6);
+            // 
+            // aboutPanel
+            // 
+            this.aboutPanel.Name = "aboutPanel";
+            this.aboutPanel.ShortcutKeys = System.Windows.Forms.Keys.F1;
+            this.aboutPanel.Size = new System.Drawing.Size(188, 24);
+            this.aboutPanel.Text = "О программе";
+            this.aboutPanel.Click += new System.EventHandler(this.aboutPanel_Click);
             // 
             // fastToolButton
             // 
@@ -899,67 +907,74 @@ namespace NotepadPlusPlus
             this.toolStripMenuItem3,
             this.deleteToolStripMenuItem});
             this.contextOption.Name = "contextMenuStrip1";
-            this.contextOption.Size = new System.Drawing.Size(123, 186);
+            this.contextOption.Size = new System.Drawing.Size(149, 186);
             // 
             // copyToolStripMenuItem1
             // 
+            this.copyToolStripMenuItem1.Image = ((System.Drawing.Image)(resources.GetObject("copyToolStripMenuItem1.Image")));
             this.copyToolStripMenuItem1.Name = "copyToolStripMenuItem1";
-            this.copyToolStripMenuItem1.Size = new System.Drawing.Size(122, 22);
-            this.copyToolStripMenuItem1.Text = "Copy";
+            this.copyToolStripMenuItem1.Size = new System.Drawing.Size(148, 22);
+            this.copyToolStripMenuItem1.Text = "Копировать";
             this.copyToolStripMenuItem1.Click += new System.EventHandler(this.CopyTextMenu_Click);
             // 
             // pasteToolStripMenuItem1
             // 
+            this.pasteToolStripMenuItem1.Image = ((System.Drawing.Image)(resources.GetObject("pasteToolStripMenuItem1.Image")));
             this.pasteToolStripMenuItem1.Name = "pasteToolStripMenuItem1";
-            this.pasteToolStripMenuItem1.Size = new System.Drawing.Size(122, 22);
-            this.pasteToolStripMenuItem1.Text = "Paste";
+            this.pasteToolStripMenuItem1.Size = new System.Drawing.Size(148, 22);
+            this.pasteToolStripMenuItem1.Text = "Вставить";
             this.pasteToolStripMenuItem1.Click += new System.EventHandler(this.PasteMenu_Click);
             // 
             // selectAllToolStripMenuItem
             // 
+            this.selectAllToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("selectAllToolStripMenuItem.Image")));
             this.selectAllToolStripMenuItem.Name = "selectAllToolStripMenuItem";
-            this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
-            this.selectAllToolStripMenuItem.Text = "Select All";
+            this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
+            this.selectAllToolStripMenuItem.Text = "Выделить всё";
             this.selectAllToolStripMenuItem.Click += new System.EventHandler(this.SelectAllMenu_Click);
             // 
             // selectContextMenu
             // 
             this.selectContextMenu.Name = "selectContextMenu";
-            this.selectContextMenu.Size = new System.Drawing.Size(122, 22);
-            this.selectContextMenu.Text = "Select";
+            this.selectContextMenu.Size = new System.Drawing.Size(148, 22);
+            this.selectContextMenu.Text = "Выделить";
             this.selectContextMenu.Click += new System.EventHandler(this.SelectContextMenu_Click);
             // 
             // cutToolStripMenuItem
             // 
+            this.cutToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("cutToolStripMenuItem.Image")));
             this.cutToolStripMenuItem.Name = "cutToolStripMenuItem";
-            this.cutToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
-            this.cutToolStripMenuItem.Text = "Cut";
+            this.cutToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
+            this.cutToolStripMenuItem.Text = "Вырезать";
             this.cutToolStripMenuItem.Click += new System.EventHandler(this.CutMenu_Click);
             // 
             // undoContextMenu
             // 
+            this.undoContextMenu.Image = ((System.Drawing.Image)(resources.GetObject("undoContextMenu.Image")));
             this.undoContextMenu.Name = "undoContextMenu";
-            this.undoContextMenu.Size = new System.Drawing.Size(122, 22);
-            this.undoContextMenu.Text = "Undo";
+            this.undoContextMenu.Size = new System.Drawing.Size(148, 22);
+            this.undoContextMenu.Text = "Отменить";
             this.undoContextMenu.Click += new System.EventHandler(this.UndoContextMenu_Click);
             // 
             // redoContexMenu
             // 
+            this.redoContexMenu.Image = ((System.Drawing.Image)(resources.GetObject("redoContexMenu.Image")));
             this.redoContexMenu.Name = "redoContexMenu";
-            this.redoContexMenu.Size = new System.Drawing.Size(122, 22);
-            this.redoContexMenu.Text = "Redo";
+            this.redoContexMenu.Size = new System.Drawing.Size(148, 22);
+            this.redoContexMenu.Text = "Повтор";
             this.redoContexMenu.Click += new System.EventHandler(this.RedoContexMenu_Click);
             // 
             // toolStripMenuItem3
             // 
             this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-            this.toolStripMenuItem3.Size = new System.Drawing.Size(119, 6);
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(145, 6);
             // 
             // deleteToolStripMenuItem
             // 
+            this.deleteToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("deleteToolStripMenuItem.Image")));
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
-            this.deleteToolStripMenuItem.Text = "Delete";
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
+            this.deleteToolStripMenuItem.Text = "Удалить";
             this.deleteToolStripMenuItem.Click += new System.EventHandler(this.DeleteToolStripMenuItem_Click);
             // 
             // statusTextEditor
@@ -1043,7 +1058,7 @@ namespace NotepadPlusPlus
             // panel1
             // 
             this.panel1.Controls.Add(this.openedPagesLabel);
-            this.panel1.Controls.Add(this.treeView1);
+            this.panel1.Controls.Add(this.TreeView);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Right;
             this.panel1.Location = new System.Drawing.Point(663, 52);
             this.panel1.Name = "panel1";
@@ -1056,7 +1071,7 @@ namespace NotepadPlusPlus
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.openedPagesLabel.AutoSize = true;
-            this.openedPagesLabel.BackColor = System.Drawing.Color.Silver;
+            this.openedPagesLabel.BackColor = System.Drawing.Color.Transparent;
             this.openedPagesLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.25F);
             this.openedPagesLabel.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.openedPagesLabel.Location = new System.Drawing.Point(6, 0);
@@ -1065,27 +1080,19 @@ namespace NotepadPlusPlus
             this.openedPagesLabel.TabIndex = 1;
             this.openedPagesLabel.Text = "Opened Pages";
             // 
-            // treeView1
+            // TreeView
             // 
-            this.treeView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.TreeView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.treeView1.Location = new System.Drawing.Point(3, 16);
-            this.treeView1.Name = "treeView1";
-            this.treeView1.Size = new System.Drawing.Size(115, 307);
-            this.treeView1.TabIndex = 0;
+            this.TreeView.Location = new System.Drawing.Point(3, 16);
+            this.TreeView.Name = "TreeView";
+            this.TreeView.Size = new System.Drawing.Size(115, 307);
+            this.TreeView.TabIndex = 0;
             // 
             // printDialog
             // 
             this.printDialog.UseEXDialog = true;
-            // 
-            // aboutPanel
-            // 
-            this.aboutPanel.Name = "aboutPanel";
-            this.aboutPanel.ShortcutKeys = System.Windows.Forms.Keys.F1;
-            this.aboutPanel.Size = new System.Drawing.Size(188, 24);
-            this.aboutPanel.Text = "О программе";
-            this.aboutPanel.Click += new System.EventHandler(this.aboutPanel_Click);
             // 
             // MainForm
             // 
@@ -1217,17 +1224,17 @@ namespace NotepadPlusPlus
         private ToolStripMenuItem toolStripMenuItem10;
         private ToolStripMenuItem toolStripMenuItem11;
         private ToolStripSeparator toolStripMenuItem12;
-        private ToolStripMenuItem wikipediaToolStripMenuItem;
         private ToolStripSeparator toolStripSeparator5;
         private ToolStripButton CloseTabPageButton;
         private Panel panel1;
-        private TreeView treeView1;
+        private TreeView TreeView;
         private ToolStripSeparator toolStripMenuItem14;
         private ToolStripSeparator toolStripMenuItem13;
         private Label openedPagesLabel;
         private ToolStripMenuItem форматироватьToolStripMenuItem;
         private ToolStripButton toolStripButton1;
         private ToolStripMenuItem aboutPanel;
+        private ToolStripMenuItem fourthToolStripMenuItem;
     }
 }
 

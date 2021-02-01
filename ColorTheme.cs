@@ -4,7 +4,7 @@ using FastColoredTextBoxNS;
 
 namespace NotepadPlusPlus
 {
-    class ColorTheme
+    internal class ColorTheme
     {
         public void ColorChangerMainForm(MenuStrip mainMenu,
             ToolStrip fastToolButton,
@@ -16,16 +16,16 @@ namespace NotepadPlusPlus
             Color foreColor)
         {
             TabPage tabpage = tabOption.SelectedTab;
-            mainMenu.BackColor = backColor;
+            mainMenu.BackColor = Color.Black;
             mainMenu.ForeColor = foreColor;
-            fastToolButton.BackColor = backColor;
+            fastToolButton.BackColor = Color.Black;
             fastToolButton.ForeColor = foreColor;
             richTextBox.BackColor = backColor;
             richTextBox.ForeColor = foreColor;
-            statusText.BackColor = backColor;
+            statusText.BackColor = Color.Black;
             statusText.ForeColor = foreColor;
             tabpage.BorderStyle = BorderStyle.None;
-            tabpage.BackColor = backColor;
+            tabpage.BackColor = Color.Black;
         }
 
         public void ColorChangerDeveloperForm(MenuStrip mainMenu,
@@ -38,18 +38,18 @@ namespace NotepadPlusPlus
         {
             TabPage tabpage = tabOption.SelectedTab;
             tabpage.BorderStyle = BorderStyle.None;
-            tabpage.BackColor = backColor;
-            mainMenu.BackColor = backColor;
+            tabpage.BackColor = Color.Black;
+            mainMenu.BackColor = Color.Black;
             mainMenu.ForeColor = foreColor;
             tabOption.BackColor = backColor;
             tabOption.ForeColor = foreColor;
-            fastToolButton.BackColor = backColor;
+            fastToolButton.BackColor = Color.Black;
             fastToolButton.ForeColor = foreColor;
             fastColoredTextBox.BackColor = backColor;
             fastColoredTextBox.ForeColor = foreColor;
             fastColoredTextBox.IndentBackColor = backColor;
             fastColoredTextBox.LineNumberColor = foreColor;
-            statusText.BackColor = backColor;
+            statusText.BackColor = Color.Black;
             statusText.ForeColor = foreColor;
         }
     }

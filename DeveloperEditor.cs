@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Drawing.Printing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using FastColoredTextBoxNS;
@@ -18,9 +19,6 @@ namespace NotepadPlusPlus
     {
         // Путь файла который присваивается в filepath.
         private string _filePath = string.Empty;
-        // Записывается в список путей файла.
-        private readonly List<string> _openedFilesList = new List<string>();
-
         // Сколько новых файлов открыто.
         private int _filesNew;
         // Цифры в секундах для timeInterval.
@@ -35,6 +33,8 @@ namespace NotepadPlusPlus
             InitializeComponent();
         }
 
+        #region Timer
+        
         /// <summary>
         /// Событие 
         /// </summary>
@@ -57,8 +57,9 @@ namespace NotepadPlusPlus
                     TabControl.TabPageCollection tabcoll = tabOption.TabPages;
                     foreach (TabPage tabpage in tabcoll)
                     {
-                        SelectedPageTextBox().SaveToFile(path, Encoding.Default);
-                        SelectedPageTextBox().SaveToFile(tb.AccessibleDescription, Encoding.Default);
+                        SelectedPageTextBox().SaveToFile(path, Encoding.UTF8);
+                        SelectedPageTextBox().SaveToFile(tb.AccessibleDescription, Encoding.UTF8);
+
                         File.AppendAllText("DataHistoryEditor.txt", tb.AccessibleDescription + Environment.NewLine);
                     }
 
@@ -72,20 +73,24 @@ namespace NotepadPlusPlus
             }
         }
 
-        private FastColoredTextBox SelectedPageTextBox()
+        /// <summary>
+        /// Метод для запуска таймера
+        /// </summary>
+        void TimerStart()
         {
-            // Присваиваю выбранную вкладку в новый TabPage.
-            TabPage tabpage = tabOption.SelectedTab;
-            // И тут идёт проверка , если внутри вкладки если текстбокс то присваивается.
-            foreach (var c in tabpage.Controls)
-                if (c is FastColoredTextBox box)
-                {
-                    documentMap1.Target = box;
-                    return box;
-                }
-
-            return null;
+            _newTime = _timeLeft;
+            timerInterval.Interval = 1000;
+            timerInterval.Start();
+            saveIntervalMenuItem.ShortcutKeyDisplayString = "ON";
+            // Запускаем счётчик
+            timerInterval.Tick += Timer_Tick;
+            timerInterval.Start();
         }
+        #endregion
+
+        #region Файл
+
+        #region Новый файл
 
         /// <summary>
         /// The new file click.
@@ -98,14 +103,12 @@ namespace NotepadPlusPlus
         /// </param>
         private void NewFile_Click(object sender, EventArgs e)
         {
-            // Присвоим текст к новому текстбоксу.
-            FastColoredTextBox fastColoredTextBox = fcbTextBox;
             // Если вкладок меньше или равно нуля, то создаём новый файл.
             if (tabOption.TabCount >= 0)
             {
-                TabPage tabPage = new TabPage { Text = $@"Untitled ({++_filesNew})" };
+                TabPage tabPage = new TabPage {Text = $@"Untitled ({++_filesNew})"};
                 FastColoredTextBox textBox =
-                    new FastColoredTextBox { Dock = DockStyle.Fill, BorderStyle = BorderStyle.None };
+                    new FastColoredTextBox {Dock = DockStyle.Fill, BorderStyle = BorderStyle.None};
                 tabPage.Controls.Add(textBox);
 
                 // Создаём новую вкладку и текст-бокс.
@@ -118,17 +121,384 @@ namespace NotepadPlusPlus
                 // Добавим контекстное меню в новую вкладку.
                 fastColoredTextBox1.ContextMenuStrip = contextOption;
                 fastColoredTextBox1.TextChanged += FcbTextBox_TextChanged;
-                _openedFilesList.Add(tabPage.Text);
                 Text = " Untitled " + _filesNew + @" Notepad (Peergrade Version)";
-            }
-            else
-            {
-                // Часто происходит, что после создания новой вкладки, первая вкладка очищается, вот и сделал тут условие.
-                tabOption.TabPages[0].Controls[0].Text = fastColoredTextBox.Text;
             }
         }
 
+        #endregion
 
+        #region Открытие
+
+        /// <summary>
+        /// Открытие файла
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OpenFile_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Создаём новую вкладку и текст-бокс.
+                TabPage tabpage = new TabPage();
+                FastColoredTextBox fastColoredTextBox = new FastColoredTextBox();
+                // Если пользователь после выбора файла для открытия нажал "ОК".
+                // Происходит это действие.
+                if (openFile.ShowDialog() == DialogResult.OK)
+                {
+                    // После открытия создаётся новая вкладка.
+                    tabOption.SelectedTab = tabpage;
+                    // Заполняем текстбокс на полный экран.
+                    fastColoredTextBox.Dock = DockStyle.Fill;
+                    // Убираем рамку текст-бокса.
+                    fastColoredTextBox.BorderStyle = BorderStyle.None;
+                    // Добавляем в новую вкладку текст-бокс.
+                    tabpage.Controls.Add(fastColoredTextBox);
+                    // В главный параметр вкладок добавляем новый со всем функционалом.
+                    tabOption.TabPages.Add(tabpage);
+
+                    // Проверка на расширение файла, если оно такого формата, то это Microsoft Docs жи есть.
+                    if (openFile.FileName.Contains(".rtf"))
+                        fastColoredTextBox.Text = File.ReadAllText(openFile.FileName);
+                    else
+                        fastColoredTextBox.Text = File.ReadAllText(openFile.FileName);
+
+                    // Задаю коротко и надёжное имя вкладки.
+                    tabpage.Text = openFile.SafeFileName;
+                    fastColoredTextBox.TextChanged += FcbTextBox_TextChanged;
+                    fastColoredTextBox.ContextMenuStrip = contextOption;
+                    tabpage.AccessibleDescription = openFile.FileName;
+                    tabpage.ContextMenuStrip = contextTabMenuStrip;
+                    _filePath = openFile.FileName;
+
+
+                    StatusFileDetector();
+
+                    Text = $@"{_filePath} NotePad (PeerGrade Version)";
+                    // Добавляю в список недавних открытых файлов.
+                }
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message);
+            }
+        }
+        #endregion
+
+        #region Сохранение
+
+        /// <summary>
+        /// Метод сохранения файла.
+        /// </summary>
+        /// <param name="path"></param>
+        private void FileSaveFunction(string path)
+        {
+            StreamWriter streamWriter = new StreamWriter(path, false, Encoding.Default);
+            // Проверка на путь файла, если расширение rtf, то выполняем это действие.
+            if (path.Contains(".rtf"))
+                streamWriter.WriteLine(SelectedPageTextBox().Rtf);
+            else
+                streamWriter.WriteLine(SelectedPageTextBox().Text);
+
+            _filePath = path;
+            Text = $@"{_filePath} NotePad (PeerGrade Version)";
+            // Закрываем поток.
+            streamWriter.Close();
+        }
+
+        /// <summary>
+        /// Сохранение файлов
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SaveFile_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                TabPage tb = tabOption.SelectedTab;
+                if (tb.Text.Contains("Untitled"))
+                {
+                    // Перебираю вкладки для сохранения и проверки на путь.
+                    TabControl.TabPageCollection tabcoll = tabOption.TabPages;
+                    foreach (TabPage tabpage in tabcoll)
+                    {
+                        tabOption.SelectedTab = tabpage;
+                        DialogResult dg = MessageBox.Show(
+                            "Do you want to save file " + tabpage.Text,
+                            @"Save or Not",
+                            MessageBoxButtons.YesNoCancel);
+
+                        if (dg == DialogResult.Yes)
+                        {
+                            SaveFileDialog saveFileDialog1 = new SaveFileDialog
+                            {
+                                Filter =
+                                                                         @"Текстовый документ (*.txt)|*.txt|C# (*.cs)|*.cs|JavaScript (*.js)|*.js|HTML (*.html)|*.html|CSS (*.css)|*.css|RTF (*.rtf)|*.rtf|JSON (*.json)|*.json|PHP (*.php)|*.php|Doc (*.docx)|*.docx|Все файлы (*.)|*."
+                            };
+
+                            // Если это не Untitled то выполняю быстрое сохранение.
+                            if (!tabpage.Text.Contains("Untitled"))
+                            {
+                                // Метод записи.
+                                FileSaveFunction(tabpage.AccessibleDescription);
+                                _filePath = tabpage.AccessibleDescription;
+                                // Меняю название редактора.
+                                Text = $@"{_filePath} NotePad (PeerGrade Version)";
+                                // Добавляю в историю сохранённых.
+                            }
+                            else if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+                            {
+                                // Метод записи.
+                                FileSaveFunction(saveFileDialog1.FileName);
+                                _filePath = saveFileDialog1.FileName;
+                                // Меняю название редактора.
+                                Text = $@"{_filePath} NotePad (PeerGrade Version)";
+                                openFile.FileName = saveFileDialog1.FileName;
+                                tabpage.Text = openFile.SafeFileName;
+                                tabpage.AccessibleDescription = openFile.FileName;
+                                // Добавляю в историю сохранённых.
+                            }
+                        }
+                        else if (dg == DialogResult.Cancel)
+                        {
+                            tabOption.Select();
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    // Проверка на сохранение.
+                    if (!tb.Text.Contains("Untitled"))
+                    {
+                        // Метод сохранения.
+                        FileSaveFunction(tb.AccessibleDescription);
+                    }
+                    else if (saveFile.ShowDialog() == DialogResult.OK)
+                    {
+                        // Метод сохранения.
+                        FileSaveFunction(saveFile.FileName);
+
+                        // Добавляю в переменные пути сохранения файла.
+                        openFile.FileName = saveFile.FileName;
+                        tb.Text = openFile.SafeFileName;
+                        _filePath = openFile.FileName;
+                        // Добавляю в историю сохранённых.
+                        File.AppendAllText("DataHistoryDeveloperEditor.txt", _filePath + Environment.NewLine);
+                        tb.AccessibleDescription = openFile.FileName;
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message);
+            }
+        }
+
+        /// <summary>
+        /// Сохранение файла.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SaveAsFile_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Если вкладок больше или равно 1 то выполняем сохранение аналогичное с SaveFile.
+                if (tabOption.TabCount >= 1)
+                {
+                    TabPage tabPage = tabOption.SelectedTab;
+                    if (!tabPage.Text.Contains("Untitled"))
+                    {
+                        SaveFileDialog saveFileDialog1 = new SaveFileDialog
+                        {
+                            Filter =
+                                "Текстовый документ (*.txt)|*.txt|C# (*.cs)|*.cs|JavaScript (*.js)|*.js|HTML (*.html)|*.html|CSS (*.css)|*.css|RTF (*.rtf)|*.rtf|Все файлы (*.)|*."
+                        };
+
+                        if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+                        {
+                            // Метод сохранения.
+                            FileSaveFunction(saveFileDialog1.FileName);
+
+                            Text = $@"{saveFileDialog1.FileName} NotePad (PeerGrade Version)";
+                            openFile.FileName = saveFileDialog1.FileName;
+                            tabPage.Text = openFile.SafeFileName;
+                            tabPage.AccessibleDescription = saveFileDialog1.FileName;
+                            // Запись в историю.
+                        }
+                    }
+                    else
+                    {
+                        // Метод сохранения.
+                        FileSaveFunction(tabPage.AccessibleDescription);
+
+                        Text = $@"{tabPage.AccessibleDescription} NotePad (PeerGrade Version)";
+                        openFile.FileName = tabPage.AccessibleDescription;
+                        tabPage.Text = openFile.SafeFileName;
+                        // Запись в историю.
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message);
+            }
+        }
+        #endregion
+
+        #endregion
+        
+        #region Вкладка и компиляция
+        private FastColoredTextBox SelectedPageTextBox()
+        {
+            // Присваиваю выбранную вкладку в новый TabPage.
+            TabPage tabpage = tabOption.SelectedTab;
+            // И тут идёт проверка , если внутри вкладки если текстбокс то присваивается.
+            foreach (var c in tabpage.Controls)
+                if (c is FastColoredTextBox box)
+                {
+                    documentMap.Target = box;
+                    return box;
+                }
+
+            return null;
+        }
+        
+        /// <summary>
+        /// Компиляция кода.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CompileCode_Click(object sender, EventArgs e)
+        {
+            // Создаю объект CompilerCSharp.
+            CompilerCSharp compilerCSharp = new CompilerCSharp();
+            // Создаю новый файл , в котором записан код.
+            File.WriteAllText("compiler.cs", SelectedPageTextBox().Text);
+            // Беру информацию про путь файла
+            FileInfo directory = new FileInfo("compiler.cs");
+            // Создаю новую вкладку и текстбокс
+            TabPage tb = new TabPage();
+            FastColoredTextBox ftcb = new FastColoredTextBox()
+            { Dock = DockStyle.Fill, BorderStyle = BorderStyle.None };
+            // Ставлю результат в текстбокс
+            ftcb.Text = compilerCSharp.CompileCode(@"" + directory.FullName);
+            tb.Text = "Compile Completed!";
+            // Присваиваю контролы текстбокса
+            tb.Controls.Add(ftcb);
+            tabOption.TabPages.Add(tb);
+        }
+        #endregion
+
+        #region Syntax
+
+        private void SyntaxPython_Click(object sender, EventArgs e)
+        {
+            if (tabOption.TabPages.Count >= 1)
+            {
+                SelectedPageTextBox().Language = Language.JS;
+                SelectedPageTextBox().Text = @" class MyClass:
+    # Return the resource to default setting
+    def reset(self):
+        self.setting = 0
+class ObjectPool:
+    def __init__(self, size):
+        self.objects = [MyClass() for _ in range(size)]
+    def acquire(self):
+        if self.objects:
+            return self.objects.pop()
+        else:
+            self.objects.append(MyClass())
+            return self.objects.pop()
+    def release(self, reusable):
+        reusable.reset()
+        self.objects.append(reusable)";
+            }
+
+        }
+
+        private void SyntaxCsharp_Click(object sender, EventArgs e)
+        {
+            try
+            {
+
+                if (tabOption.TabPages.Count >= 1)
+                {
+                    SelectedPageTextBox().Language = Language.CSharp;
+                    SelectedPageTextBox().Text = File.ReadAllText("CSharpExample.cs");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
+        }
+
+        private void SyntaxHTML_Click(object sender, EventArgs e)
+        {
+            if (tabOption.TabPages.Count >= 1)
+            {
+                SelectedPageTextBox().Language = Language.HTML;
+                SelectedPageTextBox().Text = @"<!DOCTYPE html>
+<head>
+<title>TestTitle</title>
+</head>
+    <body>
+        <h1> Hello World and PeerGrade! </h1> 
+    </body>
+</head>
+</html>
+";
+            }
+
+        }
+
+        private void JsonMenuItem_Click(object sender, EventArgs e)
+        {
+            if (tabOption.TabPages.Count >= 1)
+            {
+                SelectedPageTextBox().Language = Language.JSON;
+                SelectedPageTextBox().Text = @"{
+    ""users"": [
+            {{repeat(5)}}
+            {
+                ""id"": {{id()}},
+                ""guid"": {{guid()}},
+            ""description"": {{string(50)}},
+            ""birth_year"": {{random(1975, 2005)}},
+            ""date_created"": {{timestamp()}}
+            }
+            ]
+        }";
+            }
+        }
+
+        private void PhpMenuItem_Click(object sender, EventArgs e)
+        {
+            if (tabOption.TabPages.Count >= 1)
+            {
+                SelectedPageTextBox().Language = Language.PHP;
+                SelectedPageTextBox().Text = @" public function set($name, $value)
+ {
+     if ($value instanceof \Innomatic\Tpl\Template) {
+         // This is a subtemplate, process it.
+         //
+         $this->vars[$name] = $value->parse();
+     } else {
+         // This is a string, it must be passed as a CDATA.
+         //
+         $this->vars[$name] = $value;
+         $this->tplEngine->set($name, \Shared\Wui\WuiXml::cdata($value));
+     }
+ }";
+            }
+
+        }
+
+         /// <summary>
+        /// Очень долгая проверка которая занимает 3 секунды , я поленился менять
+        /// </summary>
         private void StatusFileDetector()
         {
             TabPage tabPage = tabOption.SelectedTab;
@@ -179,292 +549,6 @@ namespace NotepadPlusPlus
             }
         }
 
-        /// <summary>
-        /// Открытие файла
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void OpenFile_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                // Создаём новую вкладку и текст-бокс.
-                TabPage tabpage = new TabPage();
-                FastColoredTextBox fastColoredTextBox = new FastColoredTextBox();
-                // Если пользователь после выбора файла для открытия нажал "ОК".
-                // Происходит это действие.
-                if (openFile.ShowDialog() == DialogResult.OK)
-                {
-                    // После открытия создаётся новая вкладка.
-                    tabOption.SelectedTab = tabpage;
-                    // Заполняем текстбокс на полный экран.
-                    fastColoredTextBox.Dock = DockStyle.Fill;
-                    // Убираем рамку текст-бокса.
-                    fastColoredTextBox.BorderStyle = BorderStyle.None;
-                    // Добавляем в новую вкладку текст-бокс.
-                    tabpage.Controls.Add(fastColoredTextBox);
-                    // В главный параметр вкладок добавляем новый со всем функционалом.
-                    tabOption.TabPages.Add(tabpage);
-
-                    // Проверка на расширение файла, если оно такого формата, то это Microsoft Docs жи есть.
-                    if (openFile.FileName.Contains(".rtf"))
-                        fastColoredTextBox.Text = File.ReadAllText(openFile.FileName);
-                    else
-                        fastColoredTextBox.Text = File.ReadAllText(openFile.FileName);
-
-                    // Задаю коротко и надёжное имя вкладки.
-                    tabpage.Text = openFile.SafeFileName;
-                    fastColoredTextBox.TextChanged += FcbTextBox_TextChanged;
-                    fastColoredTextBox.ContextMenuStrip = contextOption;
-                    tabpage.AccessibleDescription = openFile.FileName;
-                    tabpage.ContextMenuStrip = contextTabMenuStrip;
-                    _filePath = openFile.FileName;
-
-                    StatusFileDetector();
-
-                    Text = $@"{_filePath} NotePad (PeerGrade Version)";
-                    // Добавляю в список недавних открытых файлов
-                    _openedFilesList.Add(_filePath);
-                    File.AppendAllText("DataHistoryDeveloperEditor.txt", _filePath + Environment.NewLine);
-                }
-            }
-            catch (Exception exception)
-            {
-                MessageBox.Show(exception.Message);
-            }
-        }
-
-        private void SaveFile_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                TabPage tb = tabOption.SelectedTab;
-                if (tb.Text.Contains("Untitled"))
-                {
-                    TabControl.TabPageCollection tabcoll = tabOption.TabPages;
-                    foreach (TabPage tabpage in tabcoll)
-                    {
-                        tabOption.SelectedTab = tabpage;
-                        DialogResult dg = MessageBox.Show(
-                            "Do you want to save file " + tabpage.Text,
-                            @"Save or Not",
-                            MessageBoxButtons.YesNoCancel);
-
-                        if (dg == DialogResult.Yes)
-                        {
-                            SaveFileDialog saveFileDialog1 = new SaveFileDialog
-                            {
-                                Filter =
-                                                                         @"Текстовый документ (*.txt)|*.txt|C# (*.cs)|*.cs|JavaScript (*.js)|*.js|HTML (*.html)|*.html|CSS (*.css)|*.css|RTF (*.rtf)|*.rtf|JSON (*.json)|*.json|PHP (*.php)|*.php|Doc (*.docx)|*.docx|Все файлы (*.)|*."
-                            };
-
-                            if (!tabpage.Text.Contains("Untitled"))
-                            {
-                                FileSaveFunction(tabpage.AccessibleDescription);
-                                _filePath = tabpage.AccessibleDescription;
-                                Text = $@"{_filePath} NotePad (PeerGrade Version)";
-                                File.AppendAllText("DataHistoryDeveloperEditor.txt", _filePath + Environment.NewLine);
-                            }
-                            else if (saveFileDialog1.ShowDialog() == DialogResult.OK)
-                            {
-                                FileSaveFunction(saveFileDialog1.FileName);
-                                _filePath = saveFileDialog1.FileName;
-                                Text = $@"{_filePath} NotePad (PeerGrade Version)";
-                                openFile.FileName = saveFileDialog1.FileName;
-                                tabpage.Text = openFile.SafeFileName;
-                                tabpage.AccessibleDescription = openFile.FileName;
-
-                                _openedFilesList.Add(_filePath);
-                                File.AppendAllText("DataHistoryDeveloperEditor.txt", _filePath + Environment.NewLine);
-                            }
-                        }
-                        else if (dg == DialogResult.Cancel)
-                        {
-                            tabOption.Select();
-                        }
-                    }
-                }
-                else
-                {
-                    if (!tb.Text.Contains("Untitled"))
-                    {
-                        FileSaveFunction(tb.AccessibleDescription);
-                    }
-                    else if (saveFile.ShowDialog() == DialogResult.OK)
-                    {
-                        FileSaveFunction(saveFile.FileName);
-
-                        openFile.FileName = saveFile.FileName;
-                        tb.Text = openFile.SafeFileName;
-                        _filePath = openFile.FileName;
-                        File.AppendAllText("DataHistoryDeveloperEditor.txt", _filePath + Environment.NewLine);
-                        _openedFilesList.Add(_filePath);
-                        tb.AccessibleDescription = openFile.FileName;
-                    }
-                }
-            }
-            catch (Exception exception)
-            {
-                MessageBox.Show(exception.Message);
-            }
-        }
-
-        private void SaveAsFile_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                if (tabOption.TabCount >= 1)
-                {
-                    TabPage tabPage = tabOption.SelectedTab;
-                    if (!tabPage.Text.Contains("Untitled"))
-                    {
-                        SaveFileDialog saveFileDialog1 = new SaveFileDialog
-                        {
-                            Filter =
-                                "Текстовый документ (*.txt)|*.txt|C# (*.cs)|*.cs|JavaScript (*.js)|*.js|HTML (*.html)|*.html|CSS (*.css)|*.css|RTF (*.rtf)|*.rtf|Все файлы (*.)|*."
-                        };
-
-                        if (saveFileDialog1.ShowDialog() == DialogResult.OK)
-                        {
-                            FileSaveFunction(saveFileDialog1.FileName);
-
-                            Text = $@"{saveFileDialog1.FileName} NotePad (PeerGrade Version)";
-                            openFile.FileName = saveFileDialog1.FileName;
-                            tabPage.Text = openFile.SafeFileName;
-                            tabPage.AccessibleDescription = saveFileDialog1.FileName;
-                            File.AppendAllText("DataHistoryDeveloperEditor.txt", _filePath + Environment.NewLine);
-                        }
-                    }
-                    else
-                    {
-                        FileSaveFunction(tabPage.AccessibleDescription);
-
-                        Text = $@"{tabPage.AccessibleDescription} NotePad (PeerGrade Version)";
-                        openFile.FileName = tabPage.AccessibleDescription;
-                        tabPage.Text = openFile.SafeFileName;
-                        File.AppendAllText("DataHistoryDeveloperEditor.txt", _filePath + Environment.NewLine);
-                    }
-                }
-            }
-            catch (Exception exception)
-            {
-                MessageBox.Show(exception.Message);
-            }
-        }
-
-        /// <summary>
-        /// Выбор шрифта, фона
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void FontOption_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                fontOption.ShowDialog();
-                SelectedPageTextBox().Font = fontOption.Font;
-                SelectedPageTextBox().ForeColor = fontOption.Color;
-            }
-            catch (Exception exception)
-            {
-                MessageBox.Show(exception.Message);
-            }
-        }
-
-        private void BackgroundTextTheme(object sender, EventArgs e)
-        {
-            colorOption.ShowDialog();
-            SelectedPageTextBox().BackColor = colorOption.Color;
-        }
-
-        private void SelectMenu_Click(object sender, EventArgs e)
-        {
-            if (SelectedPageTextBox().TextLength > 0)
-                SelectedPageTextBox().SelectAll();
-        }
-
-        private void CopyMenu_Click(object sender, EventArgs e)
-        {
-            if (SelectedPageTextBox().TextLength > 0)
-                SelectedPageTextBox().Copy();
-        }
-
-        private void PasteMenu_Click(object sender, EventArgs e)
-        {
-            if (SelectedPageTextBox().TextLength > 0)
-                SelectedPageTextBox().Paste();
-        }
-
-        private void SelectAllMenu_Click(object sender, EventArgs e)
-        {
-            if (SelectedPageTextBox().TextLength > 0)
-                SelectedPageTextBox().SelectAll();
-        }
-
-        private void CutMenu_Click(object sender, EventArgs e)
-        {
-            if (SelectedPageTextBox().TextLength > 0)
-                SelectedPageTextBox().Cut();
-        }
-
-        private void FileSaveFunction(string path)
-        {
-            StreamWriter streamWriter = new StreamWriter(path, false, Encoding.Default);
-            if (path.Contains(".rtf"))
-                streamWriter.WriteLine(SelectedPageTextBox().Rtf);
-            else
-                streamWriter.WriteLine(SelectedPageTextBox().Text);
-
-            _filePath = path;
-            Text = $@"{_filePath} NotePad (PeerGrade Version)";
-            streamWriter.Close();
-        }
-
-        private void SaveFileButton_Click(object sender, EventArgs e) => SaveFile_Click(sender, e);
-
-        private void CompileCode_Click(object sender, EventArgs e)
-        {
-            CompilerCSharp compilerCSharp = new CompilerCSharp();
-            compilerCSharp.CompilerResults(SelectedPageTextBox().Text, tabOption);
-        }
-
-        private void SyntaxCsharp_Click(object sender, EventArgs e)
-        {
-            try
-            {
-
-                if (tabOption.TabPages.Count >= 1)
-                {
-                    SelectedPageTextBox().Language = Language.CSharp;
-                    SelectedPageTextBox().Text = File.ReadAllText("CSharpExample.cs");
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-
-        }
-
-        private void SyntaxHTML_Click(object sender, EventArgs e)
-        {
-            if (tabOption.TabPages.Count >= 1)
-            {
-                SelectedPageTextBox().Language = Language.HTML;
-                SelectedPageTextBox().Text = @"<!DOCTYPE html>
-<head>
-<title>TestTitle</title>
-</head>
-    <body>
-        <h1> Hello World and PeerGrade! </h1> 
-    </body>
-</head>
-</html>
-";
-            }
-
-        }
-
         private void SyntaxJS_Click(object sender, EventArgs e)
         {
             if (tabOption.TabPages.Count >= 1)
@@ -487,7 +571,7 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
         private void SyntaxDefault_Click(object sender, EventArgs e)
         {
             if (tabOption.TabPages.Count >= 1)
-                SelectedPageTextBox().Text = string.Empty;
+                SelectedPageTextBox().Language = Language.Custom;
         }
 
         private void SyntaxXML_Click(object sender, EventArgs e)
@@ -507,11 +591,16 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
             }
         }
 
+        #endregion
+
+        #region Themes
+
         private void BlackTheme_Click(object sender, EventArgs e)
         {
             ColorTheme colorTheme = new ColorTheme();
-            colorTheme.ColorChangerDeveloperForm(mainMenu, toolButtons, statusStrip1, tabOption, SelectedPageTextBox(), Color.Black, Color.White);
-            BackColor = Color.Black;
+            colorTheme.ColorChangerDeveloperForm(mainMenu, toolButtons, statusStrip1, tabOption, SelectedPageTextBox(), Color.DimGray, Color.White);
+            BackColor = Color.DimGray;
+            File.WriteAllText("ThemeCollector.txt", "Black");
         }
 
 
@@ -519,8 +608,9 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
         private void HackerTheme_Click(object sender, EventArgs e)
         {
             ColorTheme colorTheme = new ColorTheme();
-            colorTheme.ColorChangerDeveloperForm(mainMenu, toolButtons, statusStrip1, tabOption, SelectedPageTextBox(), Color.Black, Color.LawnGreen);
+            colorTheme.ColorChangerDeveloperForm(mainMenu, toolButtons, statusStrip1, tabOption, SelectedPageTextBox(), Color.DimGray, Color.LawnGreen);
             BackColor = Color.Black;
+            File.WriteAllText("ThemeCollector.txt", "Hacker");
         }
 
 
@@ -528,7 +618,12 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
         {
             ColorTheme colorTheme = new ColorTheme();
             colorTheme.ColorChangerDeveloperForm(mainMenu, toolButtons, statusStrip1, tabOption, SelectedPageTextBox(), DefaultBackColor, DefaultForeColor);
-            BackColor = Color.Black;
+            BackColor = DefaultBackColor;
+            tabOption.SelectedTab.BackColor = DefaultBackColor;
+            toolButtons.BackColor = Color.AntiqueWhite;
+            mainMenu.BackColor = Color.WhiteSmoke;
+            statusStrip1.BackColor = Color.AntiqueWhite;
+            File.WriteAllText("ThemeCollector.txt", "Light");
         }
 
 
@@ -538,8 +633,15 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
             SelectedPageTextBox().ForeColor = colorOption.Color;
         }
 
+        #endregion
 
+        #region Update/Change
 
+        /// <summary>
+        /// Событие для получения сведения про строки и символы.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void FcbTextBox_TextChanged(object sender, EventArgs e)
         {
             TabPage tabPage = tabOption.SelectedTab;
@@ -550,35 +652,9 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
             _filePath = tabPage.AccessibleDescription;
         }
 
-        private void TabOption_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (tabOption.TabCount > 0)
-            {
-                TabPage tabpage = tabOption.SelectedTab;
-
-                foreach (string filename in _openedFilesList)
-                {
-                    if (tabpage != null)
-                    {
-                        string str = filename.Substring(filename.LastIndexOf("\\") + 1);
-                        if (tabpage.Text.Contains("*"))
-                        {
-                            string str2 = tabpage.Text.Remove(tabpage.Text.Length - 1);
-                            if (str == str2)
-                                Text = $@"{tabpage.Text}" + " Notepad (Peergrade Version)";
-                        }
-                        else
-                        {
-                            if (str == tabpage.Text)
-                                Text = $@"{tabpage.Text}" + " Notepad (Peergrade Version)";
-                        }
-                    }
-                }
-
-                UpdateWindow();
-            }
-        }
-
+        /// <summary>
+        /// Обновление окна
+        /// </summary>
         private void UpdateWindow()
         {
             TabControl.TabPageCollection tabcoll = tabOption.TabPages;
@@ -598,6 +674,11 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
             }
         }
 
+        /// <summary>
+        /// Сколько окон находится в данный момент.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void WindowList(object sender, EventArgs e)
         {
             ToolStripItem toolstripitem = (ToolStripItem)sender;
@@ -606,6 +687,7 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
             {
                 if (toolstripitem.Text == tb.Text)
                 {
+                    // Перебираем циклом и обновляем каждую вкладку.
                     tabOption.SelectedTab = tb;
                     var fcTextBox = tabOption.TabPages[tabOption.SelectedIndex].Controls[0];
                     fcTextBox.Select();
@@ -614,93 +696,124 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
             }
         }
 
+        #endregion
+
+        #region Closing/Load
         private void DeveloperEditor_FormClosing(object sender, FormClosingEventArgs e)
         {
             try
             {
+                // Собираю инфу про вкладку.
+                TabControl.TabPageCollection tabcoll1 = tabOption.TabPages;
+                // Читаю с текстового файла.
+                string[] arrPages = File.ReadAllLines("DataHistoryDeveloperEditor.txt");
+                // Создаю 3 списка
+                List<string> list = new List<string>(arrPages);
+                List<string> tabPageUrl = new List<string>();
+                List<string> finalList = new List<string>();
+                // Добавление вкладок в список.
+                foreach (TabPage tabpage in tabcoll1)
+                {
+                    tabPageUrl.Add(@" " + tabpage.AccessibleDescription);
+                }
+                // Убираю не нужные ссылки.
+                finalList = tabPageUrl.Where(g => !list.Contains(g)).ToList();
+
+                if (finalList.Contains("Untitled"))
+                    finalList.Remove("Untitled");
+
                 if (tabOption.TabCount > 0)
                 {
                     TabControl.TabPageCollection tabcoll = tabOption.TabPages;
+                    // Перебираем вкладки.
                     foreach (TabPage tabpage in tabcoll)
                     {
                         tabOption.SelectedTab = tabpage;
+                        // Если не сохранилось, то выполняем условие.
                         if (tabpage.Text.Contains("Untitled"))
                         {
                             SaveFile_Click(sender, e);
-                            break;
                         }
-
                         tabOption.TabPages.Remove(tabpage);
-                        TabOption_SelectedIndexChanged(sender, e);
-                        IEnumerable<string> sent = new[] {string.Empty};
-                        string[] arrPages = File.ReadAllLines("DataHistoryDeveloperEditor.txt");
-                        for (int i = 0; i < arrPages.Length; i++)
+
+                        _filePath = tabpage.AccessibleDescription;
+                        // Добавляем ссылки в файл.
+                        for (int i = 0; i < finalList.Count; i++)
                         {
-                            sent = arrPages[i].Split(' ')
-                                .Distinct(StringComparer.CurrentCultureIgnoreCase);
+                            File.AppendAllText("DataHistoryDeveloperEditor.txt", finalList[i] + Environment.NewLine);
                         }
-                        File.WriteAllLines("DataHistoryDeveloperEditor.txt", sent);
-                        File.AppendAllText("DataHistoryDeveloperEditor.txt", _filePath + Environment.NewLine);
+                        break;
                     }
                 }
+                // Добавляем в Лог.
                 File.AppendAllText("DebugLog.txt", $"[{DateTime.UtcNow}] Closing DeveloperEditor {Environment.NewLine}");
+
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show(exception.Message);
             }
         }
 
-
-
-        void TimerStart()
-        {
-            _newTime = _timeLeft;
-            timerInterval.Interval = 1000;
-            timerInterval.Start();
-            saveIntervalMenuItem.ShortcutKeyDisplayString = "ON";
-            timerInterval.Tick += Timer_Tick;
-            timerInterval.Start();
-        }
-
-
+        /// <summary>
+        /// Запуск формы.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void DeveloperEditor_Load(object sender, EventArgs e)
         {
             try
             {
-                fcbTextBox.ContextMenuStrip = contextOption;
+                // Добавляем параметры
                 tabOption.ContextMenuStrip = contextTabMenuStrip;
                 string path = "DataHistoryDeveloperEditor.txt";
                 string debugLog = "DebugLog.txt";
+                // Проверка на сушествование.
                 if (!File.Exists(path))
                     File.Create(path);
                 else
                 {
                     string[] arrPages = File.ReadAllLines("DataHistoryDeveloperEditor.txt");
+                    // Если ссылок больше чем или равно 1, то выполняем условие.
+                    if (tabOption.TabCount == 0)
+                    {
+                        NewFile_Click(sender, e);
+                        string[] color = File.ReadAllLines("ThemeCollector.txt");
+                        if(color[0].Contains("Black"))
+                            BlackTheme_Click(sender, e);
+                        else if (color[0].Contains("Light"))
+                            DefaultTheme_Click(sender, e);
+                        else if (color[0].Contains("Hacker"))
+                            HackerTheme_Click(sender, e);
+                    }
                     if (arrPages.Length >= 1)
                     {
                         for (int i = 0; i < arrPages.Length; i++)
                         {
+                            // Создаём новую вкладку и текстбокс.
                             TabPage tabpage = new TabPage();
                             FastColoredTextBox fctText = new FastColoredTextBox
                             { Dock = DockStyle.Fill, BorderStyle = BorderStyle.None };
-                            var sent = arrPages[i].Trim(' ').Split(' ')
-                                .Distinct(StringComparer.CurrentCultureIgnoreCase);
-                            File.WriteAllLines("DataHistoryDeveloperEditor.txt", sent);
-                            openFile.FileName = arrPages[i];
+                            openFile.FileName = arrPages[i].Trim(' ');
+                            // Проверяем , существует ли файл
                             if (openFile.CheckFileExists)
                             {
-                                tabOption.SelectedTab = tabpage;
-                                tabOption.TabPages.Add(tabpage);
-                                tabpage.Controls.Add(fctText);
-                                tabpage.ContextMenuStrip = contextOption;
-                                fctText.Text = File.ReadAllText(arrPages[i]);
-                                tabpage.Text = openFile.SafeFileName;
-                                StatusFileDetector();
+                                if (openFile.FileName != String.Empty)
+                                {
+                                    tabOption.SelectedTab = tabpage;
+                                    tabOption.TabPages.Add(tabpage);
+                                    tabpage.Controls.Add(fctText);
+                                    tabpage.ContextMenuStrip = contextOption;
+                                    fctText.Text = File.ReadAllText(arrPages[i]);
+                                    tabpage.Text = openFile.SafeFileName;
+
+                                    fctText.TextChanged += FcbTextBox_TextChanged;
+                                    StatusFileDetector();
+                                }
                             }
                         }
                     }
-
+                    // Существует ли файл
                     if (File.Exists(debugLog))
                         File.AppendAllText("DebugLog.txt", $"[{DateTime.UtcNow}] Opening DeveloperEditor {Environment.NewLine}");
                     else
@@ -715,50 +828,9 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
                 MessageBox.Show(exception.Message);
             }
         }
+        #endregion
 
-        private void JsonMenuItem_Click(object sender, EventArgs e)
-        {
-            if (tabOption.TabPages.Count >= 1)
-            {
-                SelectedPageTextBox().Language = Language.JSON;
-                SelectedPageTextBox().Text = @"{
-    ""users"": [
-            {{repeat(5)}}
-            {
-                ""id"": {{id()}},
-                ""guid"": {{guid()}},
-            ""description"": {{string(50)}},
-            ""birth_year"": {{random(1975, 2005)}},
-            ""date_created"": {{timestamp()}}
-            }
-            ]
-        }";
-            }
-        }
-
-        private void PhpMenuItem_Click(object sender, EventArgs e)
-        {
-            if (tabOption.TabPages.Count >= 1)
-            {
-
-                SelectedPageTextBox().Language = Language.PHP;
-                SelectedPageTextBox().Text = @" public function set($name, $value)
- {
-     if ($value instanceof \Innomatic\Tpl\Template) {
-         // This is a subtemplate, process it.
-         //
-         $this->vars[$name] = $value->parse();
-     } else {
-         // This is a string, it must be passed as a CDATA.
-         //
-         $this->vars[$name] = $value;
-         $this->tplEngine->set($name, \Shared\Wui\WuiXml::cdata($value));
-     }
- }";
-            }
-
-        }
-
+        #region Кнопки меню и быстрого доступа
         /// <summary>
         /// The delete tool strip menu item_ click.
         /// </summary>
@@ -777,14 +849,92 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
                 tabOption.TabPages.Remove(tabOption.SelectedTab);
                 if (tabOption.TabPages.Count != 0)
                     tabOption.SelectedTab = tabOption.TabPages[Math.Max(newIndex, 0)];
-                if (_openedFilesList.Count != 1)
-                    _openedFilesList.RemoveAt(newIndex);
             }
             catch (Exception ex)
             {
 
             }
 
+        }
+
+        /// <summary>
+        /// Выбор шрифта, фона.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void FontOption_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                fontOption.ShowDialog();
+                SelectedPageTextBox().Font = fontOption.Font;
+                SelectedPageTextBox().ForeColor = fontOption.Color;
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message);
+            }
+        }
+
+        /// <summary>
+        ///  Выбор заднего фона.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BackgroundTextTheme(object sender, EventArgs e)
+        {
+            colorOption.ShowDialog();
+            SelectedPageTextBox().BackColor = colorOption.Color;
+        }
+        /// <summary>
+        /// Выделение области.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SelectMenu_Click(object sender, EventArgs e)
+        {
+            if (SelectedPageTextBox().TextLength > 0)
+                SelectedPageTextBox().SelectAll();
+        }
+        /// <summary>
+        /// Копировать.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CopyMenu_Click(object sender, EventArgs e)
+        {
+            if (SelectedPageTextBox().TextLength > 0)
+                SelectedPageTextBox().Copy();
+        }
+        /// <summary>
+        /// Вставить текст.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void PasteMenu_Click(object sender, EventArgs e)
+        {
+            if (SelectedPageTextBox().TextLength > 0)
+                SelectedPageTextBox().Paste();
+        }
+        /// <summary>
+        /// Выделение всей области.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SelectAllMenu_Click(object sender, EventArgs e)
+        {
+            if (SelectedPageTextBox().TextLength > 0)
+                SelectedPageTextBox().SelectAll();
+        }
+        /// <summary>
+        /// Вырезать текст.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CutMenu_Click(object sender, EventArgs e)
+        {
+            if (SelectedPageTextBox().TextLength > 0)
+                SelectedPageTextBox().Cut();
         }
 
         /// <summary>
@@ -1026,47 +1176,21 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
             _timeLeft = 0;
         }
 
-        private void SyntaxPython_Click(object sender, EventArgs e)
-        {
-            if (tabOption.TabPages.Count >= 1)
-            {
-                SelectedPageTextBox().Language = Language.JS;
-                SelectedPageTextBox().Text = @" class MyClass:
-    # Return the resource to default setting
-    def reset(self):
-        self.setting = 0
-class ObjectPool:
-    def __init__(self, size):
-        self.objects = [MyClass() for _ in range(size)]
-    def acquire(self):
-        if self.objects:
-            return self.objects.pop()
-        else:
-            self.objects.append(MyClass())
-            return self.objects.pop()
-    def release(self, reusable):
-        reusable.reset()
-        self.objects.append(reusable)";
-            }
 
-        }
+        private void CloseTabPageButton_Click(object sender, EventArgs e) => tabOption.TabPages.Remove(tabOption.SelectedTab);
 
-        private void CloseTabPageButton_Click(object sender, EventArgs e)
-        {
-            tabOption.TabPages.Remove(tabOption.SelectedTab);
-        }
-
-        private void DeleteToolStripMenu_Click_1(object sender, EventArgs e)
-        {
-            DeleteToolStripMenu_Click(sender, e);
-        }
+        private void DeleteToolStripMenu_Click_1(object sender, EventArgs e) => DeleteToolStripMenu_Click(sender, e);
 
         private void NewDeveloperWindow_Click(object sender, EventArgs e)
         {
             var newNotepad = new DeveloperEditor();
             newNotepad.Show();
         }
-
+        /// <summary>
+        /// Форматирование текста
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void FormattingToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var workspace = new AdhocWorkspace(MefHostServices.DefaultHost);
@@ -1077,43 +1201,39 @@ class ObjectPool:
                 .ToFullString();
             SelectedPageTextBox().Text = formattedSource;
         }
-
+        // Логги программы.
         private void debugInfo_Click(object sender, EventArgs e) => MessageBox.Show("Debug info is located on .exe path");
-
+        // Информация про прогу.
         private void aboutPanel_Click(object sender, EventArgs e) => MessageBox.Show("Build version: " + ProductVersion);
-
+        // Отменяем изменённый текст.
         private void UndoMenu_Click(object sender, EventArgs e) => BackButton_Click(sender, e);
-
+        // Вернём изменённый текст.
         private void RedoMenu_Click(object sender, EventArgs e) => ReturnButton_Click(sender, e);
+        private void BackButton_Click(object sender, EventArgs e) => SelectedPageTextBox()?.Undo();
         // Закрытие приложения.
         private void ExitTool_Click(object sender, EventArgs e) => Application.Exit();
-
+        private void ReturnButton_Click(object sender, EventArgs e) => SelectedPageTextBox()?.Redo();
         // Переходит в событие создания нового файла.
         private void NewFile_Button(object sender, EventArgs e) => NewFile_Click(sender, e);
-
         // Переходит в событие открытия нового файла.
         private void OpenFile_Button(object sender, EventArgs e) => OpenFile_Click(sender, e);
-
         // Переходит в событие сохранения файла с выбором расширения.
         private void SaveAs_Button(object sender, EventArgs e) => SaveAsFile_Click(sender, e);
-
         // Переходит в события копии текста.
         private void CopyText(object sender, EventArgs e) => CopyMenu_Click(sender, e);
-
+        // Вставить текст.
         private void PasteText(object sender, EventArgs e) => PasteMenu_Click(sender, e);
-
+        // Вырезать текст.
         private void CutText(object sender, EventArgs e) => CutMenu_Click(sender, e);
-
-        private void BackButton_Click(object sender, EventArgs e) => SelectedPageTextBox()?.Undo();
-
-        private void ReturnButton_Click(object sender, EventArgs e) => SelectedPageTextBox()?.Redo();
-
+        // Вырезать текст
         private void CutButton_Click(object sender, EventArgs e) => CutMenu_Click(sender, e);
-
+        // Копировать текст
         private void CopyButton_Click(object sender, EventArgs e) => CopyMenu_Click(sender, e);
-
+        // Сохранение
+        private void SaveFileButton_Click(object sender, EventArgs e) => SaveFile_Click(sender, e);
+        // Выделить всё
         private void SelectAll_Click(object sender, EventArgs e) => SelectAllMenu_Click(sender, e);
-
+        // Увеличение текстбокса
         private void ZoomIn_Click(object sender, EventArgs e)
         {
             if (SelectedPageTextBox().Zoom < 500)
@@ -1121,7 +1241,7 @@ class ObjectPool:
             else
                 MessageBox.Show($@"The zoom value is greater than {SelectedPageTextBox().Zoom}!");
         }
-
+        // Уменьшение текстбокса
         private void ZoomOut_Click(object sender, EventArgs e)
         {
             if (SelectedPageTextBox().Zoom <= 0)
@@ -1129,7 +1249,7 @@ class ObjectPool:
             else
                 SelectedPageTextBox().Zoom -= 15;
         }
-
+        // Печать файла
         private void PrintButton_Click(object sender, EventArgs e)
         {
             PrintDialog printDlg = new PrintDialog();
@@ -1141,5 +1261,6 @@ class ObjectPool:
             // Call ShowDialog  
             if (printDlg.ShowDialog() == DialogResult.OK) printDoc.Print();
         }
+        #endregion
     }
 }
