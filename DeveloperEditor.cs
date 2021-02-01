@@ -1,34 +1,34 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Printing;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms;
+using FastColoredTextBoxNS;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Formatting;
 using Microsoft.CodeAnalysis.Host.Mef;
 
 namespace NotepadPlusPlus
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Drawing;
-    using System.Drawing.Printing;
-    using System.IO;
-    using System.Text;
-    using System.Windows.Forms;
-
-    using FastColoredTextBoxNS;
-
     public partial class DeveloperEditor : Form
     {
-        // Путь файла который присваивается в filepath
+        // Путь файла который присваивается в filepath.
         private string _filePath = string.Empty;
-        // Записывается в список путей файла
+        // Записывается в список путей файла.
         private readonly List<string> _openedFilesList = new List<string>();
 
-        // Сколько новых файлов открыто
+        // Сколько новых файлов открыто.
         private int _filesNew;
-
+        // Цифры в секундах для timeInterval.
         private int _timeLeft = 300;
-
-        private int _count = 0;
-        private int _newTime = 0;
+        // Для сохранения файлов Журналирования.
+        private int _count;
+        // Нужен для автосохранения.
+        private int _newTime;
 
         public DeveloperEditor()
         {
@@ -44,17 +44,26 @@ namespace NotepadPlusPlus
         {
             try
             {
+                // Минусуется время.
                 _timeLeft--;
+                // Если время равно нулю, то выполняется это действие.
                 if (_timeLeft <= 0)
                 {
-                    this.timerInterval.Stop();
-                    string path = $@"backup/BackupDeveloperText {this._count++}.rtf";
-                    TabControl.TabPageCollection tabcoll = this.tabOption.TabPages;
+                    timerInterval.Stop();
+                    // Нужен для журналирования, файл сохраняется в пути exe-шника
+                    string path = $@"backup/BackupDeveloperText {_count++}.rtf";
+                    //
+                    TabPage tb = tabOption.SelectedTab;
+                    TabControl.TabPageCollection tabcoll = tabOption.TabPages;
                     foreach (TabPage tabpage in tabcoll)
-                        this.SelectedPageTextBox().SaveToFile(path, Encoding.Default);
+                    {
+                        SelectedPageTextBox().SaveToFile(path, Encoding.Default);
+                        SelectedPageTextBox().SaveToFile(tb.AccessibleDescription, Encoding.Default);
+                        File.AppendAllText("DataHistoryEditor.txt", tb.AccessibleDescription + Environment.NewLine);
+                    }
 
-                    this._timeLeft = this._newTime;
-                    this.timerInterval.Start();
+                    _timeLeft = _newTime;
+                    timerInterval.Start();
                 }
             }
             catch (Exception exception)
@@ -66,7 +75,7 @@ namespace NotepadPlusPlus
         private FastColoredTextBox SelectedPageTextBox()
         {
             // Присваиваю выбранную вкладку в новый TabPage.
-            TabPage tabpage = this.tabOption.SelectedTab;
+            TabPage tabpage = tabOption.SelectedTab;
             // И тут идёт проверка , если внутри вкладки если текстбокс то присваивается.
             foreach (var c in tabpage.Controls)
                 if (c is FastColoredTextBox box)
@@ -90,90 +99,88 @@ namespace NotepadPlusPlus
         private void NewFile_Click(object sender, EventArgs e)
         {
             // Присвоим текст к новому текстбоксу.
-            FastColoredTextBox fastColoredTextBox = this.fcbTextBox;
+            FastColoredTextBox fastColoredTextBox = fcbTextBox;
             // Если вкладок меньше или равно нуля, то создаём новый файл.
-            if (this.tabOption.TabCount >= 0)
+            if (tabOption.TabCount >= 0)
             {
-                TabPage tabPage = new TabPage { Text = $@"Untitled ({++this._filesNew})" };
+                TabPage tabPage = new TabPage { Text = $@"Untitled ({++_filesNew})" };
                 FastColoredTextBox textBox =
                     new FastColoredTextBox { Dock = DockStyle.Fill, BorderStyle = BorderStyle.None };
                 tabPage.Controls.Add(textBox);
 
                 // Создаём новую вкладку и текст-бокс.
-                this.tabOption.SelectedTab = tabPage;
+                tabOption.SelectedTab = tabPage;
                 // Добавляем в новую вкладку текст-бокс.
-                this.tabOption.TabPages.Add(tabPage); // В главный параметр вкладок добавляем новый со всем функционалом.
-                var fastColoredTextBox1 = this.tabOption.TabPages[this.tabOption.SelectedIndex].Controls[0];
+                tabOption.TabPages.Add(tabPage); // В главный параметр вкладок добавляем новый со всем функционалом.
+                var fastColoredTextBox1 = tabOption.TabPages[tabOption.SelectedIndex].Controls[0];
                 fastColoredTextBox1.Select();
 
                 // Добавим контекстное меню в новую вкладку.
-                fastColoredTextBox1.ContextMenuStrip = this.contextOption;
-                fastColoredTextBox1.TextChanged += this.FcbTextBox_TextChanged;
-                this._openedFilesList.Add(tabPage.Text);
-                Text = " Untitled " + this._filesNew + @" Notepad (Peergrade Version)";
+                fastColoredTextBox1.ContextMenuStrip = contextOption;
+                fastColoredTextBox1.TextChanged += FcbTextBox_TextChanged;
+                _openedFilesList.Add(tabPage.Text);
+                Text = " Untitled " + _filesNew + @" Notepad (Peergrade Version)";
             }
             else
             {
                 // Часто происходит, что после создания новой вкладки, первая вкладка очищается, вот и сделал тут условие.
-                this.tabOption.TabPages[0].Controls[0].Text = fastColoredTextBox.Text;
+                tabOption.TabPages[0].Controls[0].Text = fastColoredTextBox.Text;
             }
         }
 
 
-        private Language StatusFileDetector()
+        private void StatusFileDetector()
         {
-            if (this._filePath.Contains("."))
+            if (_filePath.Contains("."))
             {
-                this.fileStatusStrip.Text = " Файл "; ;
-                return Language.Custom;
+                fileStatusStrip.Text = " Файл "; ;
+                SelectedPageTextBox().Language = Language.Custom;
             }
-            if (this._filePath.Contains(".cs"))
+            if (_filePath.Contains(".cs"))
             {
-                this.fileStatusStrip.Text = " C# Файл ";
-                return Language.CSharp;
+                fileStatusStrip.Text = " C# Файл ";
+                SelectedPageTextBox().Language = Language.CSharp;
             }
-            if (this._filePath.Contains(".js"))
+            if (_filePath.Contains(".js"))
             {
-                this.fileStatusStrip.Text = " JS Файл ";
-                return Language.JS;
+                fileStatusStrip.Text = " JS Файл ";
+                SelectedPageTextBox().Language = Language.JS;
             }
-            if (this._filePath.Contains(".xml"))
+            if (_filePath.Contains(".xml"))
             {
-                this.fileStatusStrip.Text = "XML Файл";
-                return Language.XML;
+                fileStatusStrip.Text = "XML Файл";
+                SelectedPageTextBox().Language = Language.XML;
             }
-            if (this._filePath.Contains(".html"))
+            if (_filePath.Contains(".html"))
             {
-                this.fileStatusStrip.Text = "HTML Файл";
-                return Language.HTML;
+                fileStatusStrip.Text = "HTML Файл";
+                SelectedPageTextBox().Language = Language.HTML;
             }
-            if (this._filePath.Contains(".json"))
+            if (_filePath.Contains(".json"))
             {
-                this.SelectedPageTextBox().Language = Language.JSON;
-                this.fileStatusStrip.Text = "JSON Файл";
+                SelectedPageTextBox().Language = Language.JSON;
+                fileStatusStrip.Text = "JSON Файл";
             }
-            if (this._filePath.Contains(".php"))
+            if (_filePath.Contains(".php"))
             {
-                this.fileStatusStrip.Text = "PHP Файл";
-                return Language.PHP;
+                fileStatusStrip.Text = "PHP Файл";
+                SelectedPageTextBox().Language = Language.PHP;
             }
-            if (this._filePath.Contains(".rtf"))
+            if (_filePath.Contains(".rtf"))
             {
-                this.fileStatusStrip.Text = "RTF Файл";
-                return Language.Custom;
+                fileStatusStrip.Text = "RTF Файл";
+                SelectedPageTextBox().Language = Language.Custom;
             }
-            if (this._filePath.Contains(".docx"))
+            if (_filePath.Contains(".docx"))
             {
-                this.fileStatusStrip.Text = "DOCX Файл";
-                return Language.Custom;
+                fileStatusStrip.Text = "DOCX Файл";
+                SelectedPageTextBox().Language = Language.Custom;
             }
-            if (this._filePath.Contains(".py"))
+            if (_filePath.Contains(".py"))
             {
-                this.fileStatusStrip.Text = "Python Файл";
-                return Language.JS;
+                fileStatusStrip.Text = "Python Файл";
+                SelectedPageTextBox().Language = Language.JS;
             }
-
-            return Language.CSharp;
         }
 
         /// <summary>
@@ -190,10 +197,10 @@ namespace NotepadPlusPlus
                 FastColoredTextBox fastColoredTextBox = new FastColoredTextBox();
                 // Если пользователь после выбора файла для открытия нажал "ОК".
                 // Происходит это действие.
-                if (this.openFile.ShowDialog() == DialogResult.OK)
+                if (openFile.ShowDialog() == DialogResult.OK)
                 {
                     // После открытия создаётся новая вкладка.
-                    this.tabOption.SelectedTab = tabpage;
+                    tabOption.SelectedTab = tabpage;
                     // Заполняем текстбокс на полный экран.
                     fastColoredTextBox.Dock = DockStyle.Fill;
                     // Убираем рамку текст-бокса.
@@ -201,158 +208,34 @@ namespace NotepadPlusPlus
                     // Добавляем в новую вкладку текст-бокс.
                     tabpage.Controls.Add(fastColoredTextBox);
                     // В главный параметр вкладок добавляем новый со всем функционалом.
-                    this.tabOption.TabPages.Add(tabpage);
+                    tabOption.TabPages.Add(tabpage);
 
                     // Проверка на расширение файла, если оно такого формата, то это Microsoft Docs жи есть.
-                    if (this.openFile.FileName.Contains(".rtf"))
-                        fastColoredTextBox.Text = File.ReadAllText(this.openFile.FileName);
+                    if (openFile.FileName.Contains(".rtf"))
+                        fastColoredTextBox.Text = File.ReadAllText(openFile.FileName);
                     else
-                        fastColoredTextBox.Text = File.ReadAllText(this.openFile.FileName);
+                        fastColoredTextBox.Text = File.ReadAllText(openFile.FileName);
 
                     // Задаю коротко и надёжное имя вкладки.
-                    tabpage.Text = this.openFile.SafeFileName;
-                    fastColoredTextBox.TextChanged += this.FcbTextBox_TextChanged;
-                    fastColoredTextBox.ContextMenuStrip = this.contextOption;
+                    tabpage.Text = openFile.SafeFileName;
+                    fastColoredTextBox.TextChanged += FcbTextBox_TextChanged;
+                    fastColoredTextBox.ContextMenuStrip = contextOption;
                     tabpage.AccessibleDescription = openFile.FileName;
-                    tabpage.ContextMenuStrip = this.contextTabMenuStrip;
-                    this._filePath = this.openFile.FileName;
+                    tabpage.ContextMenuStrip = contextTabMenuStrip;
+                    _filePath = openFile.FileName;
 
                     StatusFileDetector();
 
-                    this.Text = $@"{this._filePath} NotePad (PeerGrade Version)";
+                    Text = $@"{_filePath} NotePad (PeerGrade Version)";
                     // Добавляю в список недавних открытых файлов
-                    this._openedFilesList.Add(this._filePath);
-                    DataSaver();
+                    _openedFilesList.Add(_filePath);
+                    File.AppendAllText("DataHistoryEditor.txt", _filePath + Environment.NewLine);
                 }
             }
             catch (Exception exception)
             {
                 MessageBox.Show(exception.Message);
             }
-        }
-
-        private void SaveAsFile_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                if (tabOption.TabCount >= 1)
-                {
-                    // Создаём меню сохранения файлов и добавляем фильтр сохранения.
-                    SaveFileDialog saveFileDialog1 = new SaveFileDialog
-                    {
-                        Filter =
-                            @"Текстовый документ (*.txt)|*.txt|C# (*.cs)|*.cs|JavaScript (*.js)|*.js|HTML (*.html)|*.html|CSS (*.css)|*.css|RTF (*.rtf)|*.rtf|JSON (*.json)|*.json|PHP (*.php)|*.php|Doc (*.docx)|*.docx|Все файлы (*.)|*."
-                    };
-                    // Если пользователь нажал "ОК".
-                    if (saveFileDialog1.ShowDialog() == DialogResult.OK)
-                    {
-                        FileSaveFunction(saveFileDialog1.FileName);
-                        TabPage tabPage = tabOption.SelectedTab;
-                        tabPage.Text = saveFileDialog1.FileName;
-                        _filePath = saveFileDialog1.FileName;
-
-                        // Добавляем в список путь файла
-                        this._openedFilesList.Add(this._filePath);
-                        DataSaver();
-                    }
-                }
-            }
-            catch (Exception exception)
-            {
-                MessageBox.Show(exception.Message);
-            }
-        }
-        /// <summary>
-        /// Закрытие приложения.
-        /// </summary>
-        /// <param name="sender">Вызывает событие</param>
-        /// <param name="e">Отправка действий</param>
-        private void ExitTool_Click(object sender, EventArgs e) => Application.Exit();
-
-        /// <summary>
-        /// Переходит в событие создания нового файла.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void NewFile_Button(object sender, EventArgs e) => this.NewFile_Click(sender, e);
-
-        /// <summary>
-        /// Переходит в событие открытия нового файла.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void OpenFile_Button(object sender, EventArgs e) => this.OpenFile_Click(sender, e);
-
-        // Переходит в событие сохранения файла с выбором расширения.
-        private void SaveAs_Button(object sender, EventArgs e) => this.SaveAsFile_Click(sender, e);
-
-        // Переходит в события копии текста.
-        private void CopyText(object sender, EventArgs e) => CopyMenu_Click(sender, e);
-
-        private void PasteText(object sender, EventArgs e) => PasteMenu_Click(sender, e);
-
-        private void CutText(object sender, EventArgs e) => CutMenu_Click(sender, e);
-
-        private void FontOption_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                this.fontOption.ShowDialog();
-                this.SelectedPageTextBox().Font = this.fontOption.Font;
-            }
-            catch (Exception exception)
-            {
-                MessageBox.Show(exception.Message);
-            }
-        }
-
-        private void BackgroundTextTheme(object sender, EventArgs e)
-        {
-            this.colorOption.ShowDialog();
-            this.SelectedPageTextBox().BackColor = this.colorOption.Color;
-        }
-
-        private void SelectMenu_Click(object sender, EventArgs e)
-        {
-            if (this.SelectedPageTextBox().TextLength > 0)
-                SelectedPageTextBox().Select();
-        }
-
-        private void CopyMenu_Click(object sender, EventArgs e)
-        {
-            if (this.SelectedPageTextBox().TextLength > 0)
-                this.SelectedPageTextBox().Copy();
-        }
-
-        private void PasteMenu_Click(object sender, EventArgs e)
-        {
-            if (this.SelectedPageTextBox().TextLength > 0)
-                this.SelectedPageTextBox().Paste();
-        }
-
-        private void SelectAllMenu_Click(object sender, EventArgs e)
-        {
-            if (this.SelectedPageTextBox().TextLength > 0)
-                this.SelectedPageTextBox().SelectAll();
-        }
-
-        private void CutMenu_Click(object sender, EventArgs e)
-        {
-            if (this.SelectedPageTextBox().TextLength > 0)
-                this.SelectedPageTextBox().Cut();
-        }
-
-        private void FileSaveFunction(string path)
-        {
-            StreamWriter streamWriter = new StreamWriter(path, false, Encoding.Default);
-            if (path.Contains(".rtf"))
-                streamWriter.WriteLine(this.SelectedPageTextBox().Rtf);
-            else
-                streamWriter.WriteLine(this.SelectedPageTextBox().Text);
-
-            this._filePath = path;
-            this.Text = $@"{this._filePath} NotePad (PeerGrade Version)";
-            streamWriter.Close();
         }
 
         private void SaveFile_Click(object sender, EventArgs e)
@@ -362,7 +245,7 @@ namespace NotepadPlusPlus
                 TabPage tb = tabOption.SelectedTab;
                 if (tb.Text.Contains("Untitled"))
                 {
-                    TabControl.TabPageCollection tabcoll = this.tabOption.TabPages;
+                    TabControl.TabPageCollection tabcoll = tabOption.TabPages;
                     foreach (TabPage tabpage in tabcoll)
                     {
                         tabOption.SelectedTab = tabpage;
@@ -382,21 +265,21 @@ namespace NotepadPlusPlus
                             if (!tabpage.Text.Contains("Untitled"))
                             {
                                 FileSaveFunction(tabpage.AccessibleDescription);
-                                this._filePath = tabpage.AccessibleDescription;
-                                this.Text = $@"{this._filePath} NotePad (PeerGrade Version)";
-                                DataSaver();
+                                _filePath = tabpage.AccessibleDescription;
+                                Text = $@"{_filePath} NotePad (PeerGrade Version)";
+                                File.AppendAllText("DataHistoryEditor.txt", _filePath + Environment.NewLine);
                             }
                             else if (saveFileDialog1.ShowDialog() == DialogResult.OK)
                             {
                                 FileSaveFunction(saveFileDialog1.FileName);
-                                this._filePath = saveFileDialog1.FileName;
-                                this.Text = $@"{this._filePath} NotePad (PeerGrade Version)";
-                                this.openFile.FileName = saveFileDialog1.FileName;
+                                _filePath = saveFileDialog1.FileName;
+                                Text = $@"{_filePath} NotePad (PeerGrade Version)";
+                                openFile.FileName = saveFileDialog1.FileName;
                                 tabpage.Text = openFile.SafeFileName;
                                 tabpage.AccessibleDescription = openFile.FileName;
 
-                                this._openedFilesList.Add(this._filePath);
-                                DataSaver();
+                                _openedFilesList.Add(_filePath);
+                                File.AppendAllText("DataHistoryEditor.txt", _filePath + Environment.NewLine);
                             }
                         }
                         else if (dg == DialogResult.Cancel)
@@ -415,11 +298,12 @@ namespace NotepadPlusPlus
                     {
                         FileSaveFunction(saveFile.FileName);
 
-                        this.openFile.FileName = saveFile.FileName;
+                        openFile.FileName = saveFile.FileName;
                         tb.Text = openFile.SafeFileName;
                         _filePath = openFile.FileName;
-                        DataSaver();
-                        this._openedFilesList.Add(this._filePath);
+                        File.AppendAllText("DataHistoryEditor.txt", _filePath + Environment.NewLine);
+                        _openedFilesList.Add(_filePath);
+                        tb.AccessibleDescription = openFile.FileName;
                     }
                 }
             }
@@ -429,18 +313,118 @@ namespace NotepadPlusPlus
             }
         }
 
-        private void DataSaver()
+        private void SaveAsFile_Click(object sender, EventArgs e)
         {
-            string[] arrPages = File.ReadAllLines("DataHistoryEditor.txt");
-            for (int i = 0; i < arrPages.Length; i++)
-                if (arrPages[i].Contains(_filePath))
-                    File.AppendAllText("DataHistoryEditor.txt", this._filePath + Environment.NewLine);
+            try
+            {
+                if (tabOption.TabCount >= 1)
+                {
+                    TabPage tabPage = tabOption.SelectedTab;
+                    if (!tabPage.Text.Contains("Untitled"))
+                    {
+                        SaveFileDialog saveFileDialog1 = new SaveFileDialog
+                        {
+                            Filter =
+                                "Текстовый документ (*.txt)|*.txt|C# (*.cs)|*.cs|JavaScript (*.js)|*.js|HTML (*.html)|*.html|CSS (*.css)|*.css|RTF (*.rtf)|*.rtf|Все файлы (*.)|*."
+                        };
+
+                        if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+                        {
+                            FileSaveFunction(saveFileDialog1.FileName);
+
+                            Text = $@"{saveFileDialog1.FileName} NotePad (PeerGrade Version)";
+                            openFile.FileName = saveFileDialog1.FileName;
+                            tabPage.Text = openFile.SafeFileName;
+                            tabPage.AccessibleDescription = saveFileDialog1.FileName;
+                            File.AppendAllText("DataHistoryEditor.txt", _filePath + Environment.NewLine);
+                        }
+                    }
+                    else
+                    {
+                        FileSaveFunction(tabPage.AccessibleDescription);
+
+                        Text = $@"{tabPage.AccessibleDescription} NotePad (PeerGrade Version)";
+                        openFile.FileName = tabPage.AccessibleDescription;
+                        tabPage.Text = openFile.SafeFileName;
+                        File.AppendAllText("DataHistoryEditor.txt", _filePath + Environment.NewLine);
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message);
+            }
         }
 
-        private void SaveFileButton_Click(object sender, EventArgs e)
+        /// <summary>
+        /// Выбор шрифта, фона
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void FontOption_Click(object sender, EventArgs e)
         {
-            this.SaveFile_Click(sender, e);
+            try
+            {
+                fontOption.ShowDialog();
+                SelectedPageTextBox().Font = fontOption.Font;
+                SelectedPageTextBox().ForeColor = fontOption.Color;
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message);
+            }
         }
+
+        private void BackgroundTextTheme(object sender, EventArgs e)
+        {
+            colorOption.ShowDialog();
+            SelectedPageTextBox().BackColor = colorOption.Color;
+        }
+
+        private void SelectMenu_Click(object sender, EventArgs e)
+        {
+            if (SelectedPageTextBox().TextLength > 0)
+                SelectedPageTextBox().SelectAll();
+        }
+
+        private void CopyMenu_Click(object sender, EventArgs e)
+        {
+            if (SelectedPageTextBox().TextLength > 0)
+                SelectedPageTextBox().Copy();
+        }
+
+        private void PasteMenu_Click(object sender, EventArgs e)
+        {
+            if (SelectedPageTextBox().TextLength > 0)
+                SelectedPageTextBox().Paste();
+        }
+
+        private void SelectAllMenu_Click(object sender, EventArgs e)
+        {
+            if (SelectedPageTextBox().TextLength > 0)
+                SelectedPageTextBox().SelectAll();
+        }
+
+        private void CutMenu_Click(object sender, EventArgs e)
+        {
+            if (SelectedPageTextBox().TextLength > 0)
+                SelectedPageTextBox().Cut();
+        }
+
+        private void FileSaveFunction(string path)
+        {
+            StreamWriter streamWriter = new StreamWriter(path, false, Encoding.Default);
+            if (path.Contains(".rtf"))
+                streamWriter.WriteLine(SelectedPageTextBox().Rtf);
+            else
+                streamWriter.WriteLine(SelectedPageTextBox().Text);
+
+            _filePath = path;
+            Text = $@"{_filePath} NotePad (PeerGrade Version)";
+            streamWriter.Close();
+        }
+
+        private void SaveFileButton_Click(object sender, EventArgs e) => SaveFile_Click(sender, e);
 
         private void CompileCode_Click(object sender, EventArgs e)
         {
@@ -453,10 +437,10 @@ namespace NotepadPlusPlus
             try
             {
 
-                if (this.tabOption.TabPages.Count >= 1)
+                if (tabOption.TabPages.Count >= 1)
                 {
-                    this.SelectedPageTextBox().Language = Language.CSharp;
-                    this.SelectedPageTextBox().Text = File.ReadAllText("CSharpExample.cs");
+                    SelectedPageTextBox().Language = Language.CSharp;
+                    SelectedPageTextBox().Text = File.ReadAllText("CSharpExample.cs");
                 }
             }
             catch (Exception ex)
@@ -468,10 +452,10 @@ namespace NotepadPlusPlus
 
         private void SyntaxHTML_Click(object sender, EventArgs e)
         {
-            if (this.tabOption.TabPages.Count >= 1)
+            if (tabOption.TabPages.Count >= 1)
             {
-                this.SelectedPageTextBox().Language = Language.HTML;
-                this.SelectedPageTextBox().Text = @"<!DOCTYPE html>
+                SelectedPageTextBox().Language = Language.HTML;
+                SelectedPageTextBox().Text = @"<!DOCTYPE html>
 <head>
 <title>TestTitle</title>
 </head>
@@ -487,10 +471,10 @@ namespace NotepadPlusPlus
 
         private void SyntaxJS_Click(object sender, EventArgs e)
         {
-            if (this.tabOption.TabPages.Count >= 1)
+            if (tabOption.TabPages.Count >= 1)
             {
-                this.SelectedPageTextBox().Language = Language.JS;
-                this.SelectedPageTextBox().Text = @"function createEmail( to, from, subject, message ) {
+                SelectedPageTextBox().Language = Language.JS;
+                SelectedPageTextBox().Text = @"function createEmail( to, from, subject, message ) {
  console.log(`
    to: ${to}
    from: ${from}
@@ -506,16 +490,16 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
 
         private void SyntaxDefault_Click(object sender, EventArgs e)
         {
-            if (this.tabOption.TabPages.Count >= 1)
-                this.SelectedPageTextBox().Text = string.Empty;
+            if (tabOption.TabPages.Count >= 1)
+                SelectedPageTextBox().Text = string.Empty;
         }
 
         private void SyntaxXML_Click(object sender, EventArgs e)
         {
-            if (this.tabOption.TabPages.Count >= 1)
+            if (tabOption.TabPages.Count >= 1)
             {
-                this.SelectedPageTextBox().Language = Language.XML;
-                this.SelectedPageTextBox().Text = @"<?xml version=""1.0""?>
+                SelectedPageTextBox().Language = Language.XML;
+                SelectedPageTextBox().Text = @"<?xml version=""1.0""?>
                 <CAT>
                 <NAME>PeerGrade</NAME>
                 <BREED>Iphone</BREED>
@@ -531,7 +515,7 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
         {
             ColorTheme colorTheme = new ColorTheme();
             colorTheme.ColorChangerDeveloperForm(mainMenu, toolButtons, statusStrip1, tabOption, SelectedPageTextBox(), Color.Black, Color.White);
-            this.BackColor = Color.Black;
+            BackColor = Color.Black;
         }
 
 
@@ -540,7 +524,7 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
         {
             ColorTheme colorTheme = new ColorTheme();
             colorTheme.ColorChangerDeveloperForm(mainMenu, toolButtons, statusStrip1, tabOption, SelectedPageTextBox(), Color.Black, Color.LawnGreen);
-            this.BackColor = Color.Black;
+            BackColor = Color.Black;
         }
 
 
@@ -548,73 +532,35 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
         {
             ColorTheme colorTheme = new ColorTheme();
             colorTheme.ColorChangerDeveloperForm(mainMenu, toolButtons, statusStrip1, tabOption, SelectedPageTextBox(), DefaultBackColor, DefaultForeColor);
-            this.BackColor = Color.Black;
+            BackColor = Color.Black;
         }
 
-
-
-        private void BackButton_Click(object sender, EventArgs e) => this.SelectedPageTextBox()?.Undo();
-
-        private void ReturnButton_Click(object sender, EventArgs e) => this.SelectedPageTextBox()?.Redo();
-
-        private void CutButton_Click(object sender, EventArgs e) => this.CutMenu_Click(sender, e);
-
-        private void CopyButton_Click(object sender, EventArgs e) => this.CopyMenu_Click(sender, e);
-
-        private void SelectAll_Click(object sender, EventArgs e) => this.SelectAllMenu_Click(sender, e);
-
-        private void ZoomIn_Click(object sender, EventArgs e)
-        {
-            if (this.SelectedPageTextBox().Zoom < 500)
-                this.SelectedPageTextBox().Zoom += 25;
-            else
-                MessageBox.Show($@"The zoom value is greater than {this.SelectedPageTextBox().Zoom}!");
-        }
-
-        private void ZoomOut_Click(object sender, EventArgs e)
-        {
-            if (this.SelectedPageTextBox().Zoom <= 0)
-                MessageBox.Show($@"The zoom value is less than {this.SelectedPageTextBox().Zoom}!");
-            else
-                this.SelectedPageTextBox().Zoom -= 15;
-        }
 
         private void ForeColorTheme_Click(object sender, EventArgs e)
         {
-            this.colorOption.ShowDialog();
-            this.SelectedPageTextBox().ForeColor = this.colorOption.Color;
+            colorOption.ShowDialog();
+            SelectedPageTextBox().ForeColor = colorOption.Color;
         }
 
 
-        private void PrintButton_Click(object sender, EventArgs e)
-        {
-            PrintDialog printDlg = new PrintDialog();
-            PrintDocument printDoc = new PrintDocument { DocumentName = "Print Document" };
-
-            printDlg.Document = printDoc;
-            printDlg.AllowSelection = true;
-            printDlg.AllowSomePages = true;
-            // Call ShowDialog  
-            if (printDlg.ShowDialog() == DialogResult.OK) printDoc.Print();
-        }
 
         private void FcbTextBox_TextChanged(object sender, EventArgs e)
         {
-            TabPage tabPage = this.tabOption.SelectedTab;
-            string text = this.SelectedPageTextBox()?.Text;
+            TabPage tabPage = tabOption.SelectedTab;
+            string text = SelectedPageTextBox()?.Text;
             string[] lines = text.Split('\n');
-            this.statusLabel.Text = $@"Symbols: {text.Length}";
-            this.rowsInfo.Text = $@"Rows: {lines.Length}";
-            this._filePath = tabPage.AccessibleDescription;
+            statusLabel.Text = $@"Symbols: {text.Length}";
+            rowsInfo.Text = $@"Rows: {lines.Length}";
+            _filePath = tabPage.AccessibleDescription;
         }
 
         private void TabOption_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (tabOption.TabCount > 0)
             {
-                TabPage tabpage = this.tabOption.SelectedTab;
+                TabPage tabpage = tabOption.SelectedTab;
 
-                foreach (string filename in this._openedFilesList)
+                foreach (string filename in _openedFilesList)
                 {
                     if (tabpage != null)
                     {
@@ -623,23 +569,23 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
                         {
                             string str2 = tabpage.Text.Remove(tabpage.Text.Length - 1);
                             if (str == str2)
-                                this.Text = $@"{tabpage.Text}" + " Notepad (Peergrade Version)";
+                                Text = $@"{tabpage.Text}" + " Notepad (Peergrade Version)";
                         }
                         else
                         {
                             if (str == tabpage.Text)
-                                this.Text = $@"{tabpage.Text}" + " Notepad (Peergrade Version)";
+                                Text = $@"{tabpage.Text}" + " Notepad (Peergrade Version)";
                         }
                     }
                 }
 
-                this.UpdateWindow();
+                UpdateWindow();
             }
         }
 
         private void UpdateWindow()
         {
-            TabControl.TabPageCollection tabcoll = this.tabOption.TabPages;
+            TabControl.TabPageCollection tabcoll = tabOption.TabPages;
 
             foreach (TabPage tabpage in tabcoll)
             {
@@ -650,16 +596,16 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
                     menuitem.Checked = true;
                 else
                     menuitem.Checked = false;
-                this.Invalidate();
+                Invalidate();
 
-                menuitem.Click += this.WindowList;
+                menuitem.Click += WindowList;
             }
         }
 
         private void WindowList(object sender, EventArgs e)
         {
             ToolStripItem toolstripitem = (ToolStripItem)sender;
-            TabControl.TabPageCollection tabcoll = this.tabOption.TabPages;
+            TabControl.TabPageCollection tabcoll = tabOption.TabPages;
             foreach (TabPage tb in tabcoll)
             {
                 if (toolstripitem.Text == tb.Text)
@@ -667,7 +613,7 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
                     tabOption.SelectedTab = tb;
                     var fcTextBox = tabOption.TabPages[tabOption.SelectedIndex].Controls[0];
                     fcTextBox.Select();
-                    this.UpdateWindow();
+                    UpdateWindow();
                 }
             }
         }
@@ -684,14 +630,15 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
                         tabOption.SelectedTab = tabpage;
                         if (tabpage.Text.Contains("Untitled"))
                         {
-                            this.SaveFile_Click(sender, e);
+                            SaveFile_Click(sender, e);
                             break;
                         }
 
                         tabOption.TabPages.Remove(tabpage);
-                        this.TabOption_SelectedIndexChanged(sender, e);
+                        TabOption_SelectedIndexChanged(sender, e);
                     }
                 }
+                File.AppendAllText("DebugLog.txt", $"[{DateTime.UtcNow}] Closing DeveloperEditor {Environment.NewLine}");
             }
             catch (Exception ex)
             {
@@ -699,18 +646,16 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
             }
         }
 
-        private void UndoMenu_Click(object sender, EventArgs e) => BackButton_Click(sender, e);
-
-        private void RedoMenu_Click(object sender, EventArgs e) => ReturnButton_Click(sender, e);
+      
 
         void TimerStart()
         {
-            this._newTime = this._timeLeft;
-            this.timerInterval.Interval = 1000;
-            this.timerInterval.Start();
-            this.saveIntervalMenuItem.ShortcutKeyDisplayString = "ON";
-            this.timerInterval.Tick += Timer_Tick;
-            this.timerInterval.Start();
+            _newTime = _timeLeft;
+            timerInterval.Interval = 1000;
+            timerInterval.Start();
+            saveIntervalMenuItem.ShortcutKeyDisplayString = "ON";
+            timerInterval.Tick += Timer_Tick;
+            timerInterval.Start();
         }
 
 
@@ -718,8 +663,8 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
         {
             try
             {
-                this.fcbTextBox.ContextMenuStrip = this.contextOption;
-                this.tabOption.ContextMenuStrip = this.contextTabMenuStrip;
+                fcbTextBox.ContextMenuStrip = contextOption;
+                tabOption.ContextMenuStrip = contextTabMenuStrip;
                 string[] arrPages = File.ReadAllLines("DataHistoryDeveloperEditor.txt");
                 if (arrPages.Length >= 1)
                 {
@@ -727,19 +672,22 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
                     {
                         TabPage tabpage = new TabPage();
                         FastColoredTextBox fctText = new FastColoredTextBox { Dock = DockStyle.Fill, BorderStyle = BorderStyle.None };
-                        this.openFile.FileName = arrPages[i];
-                        if (this.openFile.CheckFileExists)
+                        var sent = arrPages[i].Trim(' ').Split(' ').Distinct(StringComparer.CurrentCultureIgnoreCase);
+                        File.WriteAllLines("DataHistoryDeveloperEditor.txt", sent);
+                        openFile.FileName = arrPages[i];
+                        if (openFile.CheckFileExists)
                         {
-                            this.tabOption.SelectedTab = tabpage;
-                            this.tabOption.TabPages.Add(tabpage);
+                            tabOption.SelectedTab = tabpage;
+                            tabOption.TabPages.Add(tabpage);
                             tabpage.Controls.Add(fctText);
-                            fctText.Language = this.StatusFileDetector();
-                            tabpage.ContextMenuStrip = this.contextOption;
+                            tabpage.ContextMenuStrip = contextOption;
                             fctText.Text = File.ReadAllText(arrPages[i]);
-                            tabpage.Text = this.openFile.SafeFileName;
+                            tabpage.Text = openFile.SafeFileName;
+                            StatusFileDetector();
                         }
                     }
                 }
+                File.AppendAllText("DebugLog.txt", $"[{DateTime.UtcNow}] Opening DeveloperEditor {Environment.NewLine}");
             }
             catch (Exception exception)
             {
@@ -749,10 +697,10 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
 
         private void JsonMenuItem_Click(object sender, EventArgs e)
         {
-            if (this.tabOption.TabPages.Count >= 1)
+            if (tabOption.TabPages.Count >= 1)
             {
-                this.SelectedPageTextBox().Language = Language.JSON;
-                this.SelectedPageTextBox().Text = @"{
+                SelectedPageTextBox().Language = Language.JSON;
+                SelectedPageTextBox().Text = @"{
     ""users"": [
             {{repeat(5)}}
             {
@@ -769,11 +717,11 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
 
         private void PhpMenuItem_Click(object sender, EventArgs e)
         {
-            if (this.tabOption.TabPages.Count >= 1)
+            if (tabOption.TabPages.Count >= 1)
             {
 
-                this.SelectedPageTextBox().Language = Language.PHP;
-                this.SelectedPageTextBox().Text = @" public function set($name, $value)
+                SelectedPageTextBox().Language = Language.PHP;
+                SelectedPageTextBox().Text = @" public function set($name, $value)
  {
      if ($value instanceof \Innomatic\Tpl\Template) {
          // This is a subtemplate, process it.
@@ -803,13 +751,13 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
         {
             try
             {
-                var newIndex = this.tabOption.TabPages.IndexOf(this.tabOption.SelectedTab) - 1;
+                var newIndex = tabOption.TabPages.IndexOf(tabOption.SelectedTab) - 1;
 
-                this.tabOption.TabPages.Remove(this.tabOption.SelectedTab);
-                if (this.tabOption.TabPages.Count != 0)
-                    this.tabOption.SelectedTab = this.tabOption.TabPages[Math.Max(newIndex, 0)];
-                if (this._openedFilesList.Count != 1)
-                    this._openedFilesList.RemoveAt(newIndex);
+                tabOption.TabPages.Remove(tabOption.SelectedTab);
+                if (tabOption.TabPages.Count != 0)
+                    tabOption.SelectedTab = tabOption.TabPages[Math.Max(newIndex, 0)];
+                if (_openedFilesList.Count != 1)
+                    _openedFilesList.RemoveAt(newIndex);
             }
             catch (Exception ex)
             {
@@ -827,7 +775,7 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
         /// <param name="e">
         /// The e.
         /// </param>
-        private void UpdateWindowToolStripMenuItem_Click(object sender, EventArgs e) => this.UpdateWindow();
+        private void UpdateWindowToolStripMenuItem_Click(object sender, EventArgs e) => UpdateWindow();
 
         /// <summary>
         /// The cut context menu_ click.
@@ -838,7 +786,7 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
         /// <param name="e">
         /// The e.
         /// </param>
-        private void CutContextMenu_Click(object sender, EventArgs e) => this.CutButton_Click(sender, e);
+        private void CutContextMenu_Click(object sender, EventArgs e) => CutButton_Click(sender, e);
 
         /// <summary>
         /// The select context menu_ click.
@@ -849,7 +797,7 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
         /// <param name="e">
         /// The e.
         /// </param>
-        private void SelectContextMenu_Click(object sender, EventArgs e) => this.SelectMenu_Click(sender, e);
+        private void SelectContextMenu_Click(object sender, EventArgs e) => SelectMenu_Click(sender, e);
 
         /// <summary>
         /// The redo contex menu_ click.
@@ -860,7 +808,7 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
         /// <param name="e">
         /// The e.
         /// </param>
-        private void RedoContextMenu_Click(object sender, EventArgs e) => this.RedoMenu_Click(sender, e);
+        private void RedoContextMenu_Click(object sender, EventArgs e) => RedoMenu_Click(sender, e);
 
         /// <summary>
         /// The undo context menu_ click.
@@ -871,7 +819,7 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
         /// <param name="e">
         /// The e.
         /// </param>
-        private void UndoContextMenu_Click(object sender, EventArgs e) => this.UndoMenu_Click(sender, e);
+        private void UndoContextMenu_Click(object sender, EventArgs e) => UndoMenu_Click(sender, e);
 
         /// <summary>
         /// The delete tool strip menu_ click.
@@ -886,9 +834,9 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
         {
             try
             {
-                if (this.tabOption.TabPages.Count >= 1)
-                    if (this.SelectedPageTextBox().TextLength > 0)
-                        this.SelectedPageTextBox().SelectedText = string.Empty;
+                if (tabOption.TabPages.Count >= 1)
+                    if (SelectedPageTextBox().TextLength > 0)
+                        SelectedPageTextBox().SelectedText = string.Empty;
             }
             catch (Exception exception)
             {
@@ -906,7 +854,7 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
         /// <param name="e">
         /// The e.
         /// </param>
-        private void FullWindowedToolStripMenuItem_Click(object sender, EventArgs e) => this.WindowState = FormWindowState.Maximized;
+        private void FullWindowedToolStripMenuItem_Click(object sender, EventArgs e) => WindowState = FormWindowState.Maximized;
 
         /// <summary>
         /// The bold tool strip menu item_ click.
@@ -921,8 +869,8 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
         {
             try
             {
-                if (this.tabOption.TabPages.Count >= 1)
-                    this.SelectedPageTextBox().Font = new Font(this.SelectedPageTextBox().Font, FontStyle.Bold);
+                if (tabOption.TabPages.Count >= 1)
+                    SelectedPageTextBox().Font = new Font(SelectedPageTextBox().Font, FontStyle.Bold);
             }
             catch (Exception exception)
             {
@@ -943,8 +891,8 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
         {
             try
             {
-                if (this.tabOption.TabPages.Count >= 1)
-                    this.SelectedPageTextBox().Font = new Font(this.SelectedPageTextBox().Font, FontStyle.Italic);
+                if (tabOption.TabPages.Count >= 1)
+                    SelectedPageTextBox().Font = new Font(SelectedPageTextBox().Font, FontStyle.Italic);
             }
             catch (Exception exception)
             {
@@ -965,8 +913,8 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
         {
             try
             {
-                if (this.tabOption.TabPages.Count >= 1)
-                    this.SelectedPageTextBox().Font = new Font(this.SelectedPageTextBox().Font, FontStyle.Underline);
+                if (tabOption.TabPages.Count >= 1)
+                    SelectedPageTextBox().Font = new Font(SelectedPageTextBox().Font, FontStyle.Underline);
             }
             catch (Exception exception)
             {
@@ -987,8 +935,8 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
         {
             try
             {
-                if (this.tabOption.TabPages.Count >= 1)
-                    this.SelectedPageTextBox().Font = new Font(this.SelectedPageTextBox().Font, FontStyle.Strikeout);
+                if (tabOption.TabPages.Count >= 1)
+                    SelectedPageTextBox().Font = new Font(SelectedPageTextBox().Font, FontStyle.Strikeout);
             }
             catch (Exception exception)
             {
@@ -1007,7 +955,7 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
         /// </param>
         private void FirstToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this._timeLeft = 300;
+            _timeLeft = 300;
             TimerStart();
         }
 
@@ -1022,7 +970,7 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
         /// </param>
         private void SecondToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this._timeLeft = 600;
+            _timeLeft = 600;
             TimerStart();
         }
 
@@ -1037,7 +985,7 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
         /// </param>
         private void ThirdToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this._timeLeft = 1200;
+            _timeLeft = 1200;
             TimerStart();
         }
 
@@ -1052,17 +1000,17 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
         /// </param>
         private void StopToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.timerInterval.Stop();
-            this.saveIntervalMenuItem.ShortcutKeyDisplayString = "OFF";
-            this._timeLeft = 0;
+            timerInterval.Stop();
+            saveIntervalMenuItem.ShortcutKeyDisplayString = "OFF";
+            _timeLeft = 0;
         }
 
         private void SyntaxPython_Click(object sender, EventArgs e)
         {
-            if (this.tabOption.TabPages.Count >= 1)
+            if (tabOption.TabPages.Count >= 1)
             {
-                this.SelectedPageTextBox().Language = Language.JS;
-                this.SelectedPageTextBox().Text = @" class MyClass:
+                SelectedPageTextBox().Language = Language.JS;
+                SelectedPageTextBox().Text = @" class MyClass:
     # Return the resource to default setting
     def reset(self):
         self.setting = 0
@@ -1084,12 +1032,12 @@ class ObjectPool:
 
         private void CloseTabPageButton_Click(object sender, EventArgs e)
         {
-            this.tabOption.TabPages.Remove(this.tabOption.SelectedTab);
+            tabOption.TabPages.Remove(tabOption.SelectedTab);
         }
 
         private void DeleteToolStripMenu_Click_1(object sender, EventArgs e)
         {
-            this.DeleteToolStripMenu_Click(sender, e);
+            DeleteToolStripMenu_Click(sender, e);
         }
 
         private void NewDeveloperWindow_Click(object sender, EventArgs e)
@@ -1101,8 +1049,76 @@ class ObjectPool:
         private void FormattingToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var workspace = new AdhocWorkspace(MefHostServices.DefaultHost);
-            var formattedSource = Formatter.Format(CSharpSyntaxTree.ParseText(SelectedPageTextBox().Text).GetRoot(), workspace).ToFullString();
+            var formattedSource = Formatter.Format(CSharpSyntaxTree.ParseText(SelectedPageTextBox()
+                            .Text)
+                        .GetRoot(),
+                    workspace)
+                .ToFullString();
             SelectedPageTextBox().Text = formattedSource;
+        }
+
+        private void debugInfo_Click(object sender, EventArgs e) => MessageBox.Show("Debug info is located on .exe path");
+
+        private void aboutPanel_Click(object sender, EventArgs e) => MessageBox.Show("Build version: " + ProductVersion);
+
+        private void UndoMenu_Click(object sender, EventArgs e) => BackButton_Click(sender, e);
+
+        private void RedoMenu_Click(object sender, EventArgs e) => ReturnButton_Click(sender, e);
+        // Закрытие приложения.
+        private void ExitTool_Click(object sender, EventArgs e) => Application.Exit();
+
+        // Переходит в событие создания нового файла.
+        private void NewFile_Button(object sender, EventArgs e) => NewFile_Click(sender, e);
+
+        // Переходит в событие открытия нового файла.
+        private void OpenFile_Button(object sender, EventArgs e) => OpenFile_Click(sender, e);
+
+        // Переходит в событие сохранения файла с выбором расширения.
+        private void SaveAs_Button(object sender, EventArgs e) => SaveAsFile_Click(sender, e);
+
+        // Переходит в события копии текста.
+        private void CopyText(object sender, EventArgs e) => CopyMenu_Click(sender, e);
+
+        private void PasteText(object sender, EventArgs e) => PasteMenu_Click(sender, e);
+
+        private void CutText(object sender, EventArgs e) => CutMenu_Click(sender, e);
+
+        private void BackButton_Click(object sender, EventArgs e) => SelectedPageTextBox()?.Undo();
+
+        private void ReturnButton_Click(object sender, EventArgs e) => SelectedPageTextBox()?.Redo();
+
+        private void CutButton_Click(object sender, EventArgs e) => CutMenu_Click(sender, e);
+
+        private void CopyButton_Click(object sender, EventArgs e) => CopyMenu_Click(sender, e);
+
+        private void SelectAll_Click(object sender, EventArgs e) => SelectAllMenu_Click(sender, e);
+
+        private void ZoomIn_Click(object sender, EventArgs e)
+        {
+            if (SelectedPageTextBox().Zoom < 500)
+                SelectedPageTextBox().Zoom += 25;
+            else
+                MessageBox.Show($@"The zoom value is greater than {SelectedPageTextBox().Zoom}!");
+        }
+
+        private void ZoomOut_Click(object sender, EventArgs e)
+        {
+            if (SelectedPageTextBox().Zoom <= 0)
+                MessageBox.Show($@"The zoom value is less than {SelectedPageTextBox().Zoom}!");
+            else
+                SelectedPageTextBox().Zoom -= 15;
+        }
+
+        private void PrintButton_Click(object sender, EventArgs e)
+        {
+            PrintDialog printDlg = new PrintDialog();
+            PrintDocument printDoc = new PrintDocument { DocumentName = "Print Document" };
+
+            printDlg.Document = printDoc;
+            printDlg.AllowSelection = true;
+            printDlg.AllowSomePages = true;
+            // Call ShowDialog  
+            if (printDlg.ShowDialog() == DialogResult.OK) printDoc.Print();
         }
     }
 }

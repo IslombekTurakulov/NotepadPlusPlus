@@ -1,17 +1,16 @@
 ﻿
+using System.ComponentModel;
 using System.Windows.Forms;
 using FastColoredTextBoxNS;
 
 namespace NotepadPlusPlus
 {
-    using System;
-
     partial class DeveloperEditor
     {
         /// <summary>
         ///  Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary>
         ///  Clean up any resources being used.
@@ -333,8 +332,8 @@ namespace NotepadPlusPlus
             this.copyToolItem.Image = ((System.Drawing.Image)(resources.GetObject("copyToolItem.Image")));
             this.copyToolItem.Name = "copyToolItem";
             this.copyToolItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
-            this.copyToolItem.Size = new System.Drawing.Size(198, 24);
-            this.copyToolItem.Text = "&Copy";
+            this.copyToolItem.Size = new System.Drawing.Size(213, 24);
+            this.copyToolItem.Text = "&Копировать";
             this.copyToolItem.Click += new System.EventHandler(this.CopyText);
             // 
             // pasteToolItem
@@ -342,8 +341,8 @@ namespace NotepadPlusPlus
             this.pasteToolItem.Image = ((System.Drawing.Image)(resources.GetObject("pasteToolItem.Image")));
             this.pasteToolItem.Name = "pasteToolItem";
             this.pasteToolItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.V)));
-            this.pasteToolItem.Size = new System.Drawing.Size(198, 24);
-            this.pasteToolItem.Text = "&Paste";
+            this.pasteToolItem.Size = new System.Drawing.Size(213, 24);
+            this.pasteToolItem.Text = "&Вставить";
             this.pasteToolItem.Click += new System.EventHandler(this.PasteText);
             // 
             // cutToolItem
@@ -351,8 +350,8 @@ namespace NotepadPlusPlus
             this.cutToolItem.Image = ((System.Drawing.Image)(resources.GetObject("cutToolItem.Image")));
             this.cutToolItem.Name = "cutToolItem";
             this.cutToolItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.X)));
-            this.cutToolItem.Size = new System.Drawing.Size(198, 24);
-            this.cutToolItem.Text = "&Cut";
+            this.cutToolItem.Size = new System.Drawing.Size(213, 24);
+            this.cutToolItem.Text = "&Вырезать";
             this.cutToolItem.Click += new System.EventHandler(this.CutText);
             // 
             // selectToolItem
@@ -360,8 +359,8 @@ namespace NotepadPlusPlus
             this.selectToolItem.Image = ((System.Drawing.Image)(resources.GetObject("selectToolItem.Image")));
             this.selectToolItem.Name = "selectToolItem";
             this.selectToolItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A)));
-            this.selectToolItem.Size = new System.Drawing.Size(198, 24);
-            this.selectToolItem.Text = "&Select";
+            this.selectToolItem.Size = new System.Drawing.Size(213, 24);
+            this.selectToolItem.Text = "&Выделить всё";
             this.selectToolItem.Click += new System.EventHandler(this.SelectMenu_Click);
             // 
             // toolStripMenuItem3
@@ -370,8 +369,8 @@ namespace NotepadPlusPlus
             this.toolStripMenuItem3.Name = "toolStripMenuItem3";
             this.toolStripMenuItem3.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.Z)));
-            this.toolStripMenuItem3.Size = new System.Drawing.Size(198, 24);
-            this.toolStripMenuItem3.Text = "Undo";
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(213, 24);
+            this.toolStripMenuItem3.Text = "Отмена";
             this.toolStripMenuItem3.Click += new System.EventHandler(this.UndoMenu_Click);
             // 
             // toolStripMenuItem7
@@ -379,21 +378,21 @@ namespace NotepadPlusPlus
             this.toolStripMenuItem7.Image = ((System.Drawing.Image)(resources.GetObject("toolStripMenuItem7.Image")));
             this.toolStripMenuItem7.Name = "toolStripMenuItem7";
             this.toolStripMenuItem7.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Y)));
-            this.toolStripMenuItem7.Size = new System.Drawing.Size(198, 24);
-            this.toolStripMenuItem7.Text = "Redo";
+            this.toolStripMenuItem7.Size = new System.Drawing.Size(213, 24);
+            this.toolStripMenuItem7.Text = "Вернуться";
             this.toolStripMenuItem7.Click += new System.EventHandler(this.RedoMenu_Click);
             // 
             // toolStripMenuItem2
             // 
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(195, 6);
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(210, 6);
             // 
             // DeleteToolStripMenu
             // 
             this.DeleteToolStripMenu.Image = global::NotepadPlusPlus.Properties.Resources.DeleteStep_16x;
             this.DeleteToolStripMenu.Name = "DeleteToolStripMenu";
             this.DeleteToolStripMenu.ShortcutKeys = System.Windows.Forms.Keys.Delete;
-            this.DeleteToolStripMenu.Size = new System.Drawing.Size(198, 24);
+            this.DeleteToolStripMenu.Size = new System.Drawing.Size(213, 24);
             this.DeleteToolStripMenu.Text = "Удалить";
             this.DeleteToolStripMenu.Click += new System.EventHandler(this.DeleteToolStripMenu_Click_1);
             // 
@@ -405,26 +404,26 @@ namespace NotepadPlusPlus
             this.rightSideToolStripMenuItem});
             this.textAlignToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("textAlignToolStripMenuItem.Image")));
             this.textAlignToolStripMenuItem.Name = "textAlignToolStripMenuItem";
-            this.textAlignToolStripMenuItem.Size = new System.Drawing.Size(198, 24);
-            this.textAlignToolStripMenuItem.Text = "Text Align";
+            this.textAlignToolStripMenuItem.Size = new System.Drawing.Size(213, 24);
+            this.textAlignToolStripMenuItem.Text = "Вид";
             // 
             // leftSideToolStripMenuItem
             // 
             this.leftSideToolStripMenuItem.Name = "leftSideToolStripMenuItem";
-            this.leftSideToolStripMenuItem.Size = new System.Drawing.Size(139, 24);
-            this.leftSideToolStripMenuItem.Text = "Left Side";
+            this.leftSideToolStripMenuItem.Size = new System.Drawing.Size(162, 24);
+            this.leftSideToolStripMenuItem.Text = "Левый край";
             // 
             // middleToolStripMenuItem
             // 
             this.middleToolStripMenuItem.Name = "middleToolStripMenuItem";
-            this.middleToolStripMenuItem.Size = new System.Drawing.Size(139, 24);
-            this.middleToolStripMenuItem.Text = "Middle";
+            this.middleToolStripMenuItem.Size = new System.Drawing.Size(162, 24);
+            this.middleToolStripMenuItem.Text = "В центре";
             // 
             // rightSideToolStripMenuItem
             // 
             this.rightSideToolStripMenuItem.Name = "rightSideToolStripMenuItem";
-            this.rightSideToolStripMenuItem.Size = new System.Drawing.Size(139, 24);
-            this.rightSideToolStripMenuItem.Text = "Right Side";
+            this.rightSideToolStripMenuItem.Size = new System.Drawing.Size(162, 24);
+            this.rightSideToolStripMenuItem.Text = "Правый край";
             // 
             // fontToolItem
             // 
@@ -523,16 +522,16 @@ namespace NotepadPlusPlus
             // 
             this.backgroundThemeItem.Image = ((System.Drawing.Image)(resources.GetObject("backgroundThemeItem.Image")));
             this.backgroundThemeItem.Name = "backgroundThemeItem";
-            this.backgroundThemeItem.Size = new System.Drawing.Size(233, 24);
-            this.backgroundThemeItem.Text = "Background Color Theme";
+            this.backgroundThemeItem.Size = new System.Drawing.Size(196, 24);
+            this.backgroundThemeItem.Text = "Задний фон";
             this.backgroundThemeItem.Click += new System.EventHandler(this.BackgroundTextTheme);
             // 
             // foreColorTheme
             // 
             this.foreColorTheme.Image = ((System.Drawing.Image)(resources.GetObject("foreColorTheme.Image")));
             this.foreColorTheme.Name = "foreColorTheme";
-            this.foreColorTheme.Size = new System.Drawing.Size(233, 24);
-            this.foreColorTheme.Text = "Fore Color Theme";
+            this.foreColorTheme.Size = new System.Drawing.Size(196, 24);
+            this.foreColorTheme.Text = "Передний фон";
             this.foreColorTheme.Click += new System.EventHandler(this.ForeColorTheme_Click);
             // 
             // generalThemeItem
@@ -544,8 +543,8 @@ namespace NotepadPlusPlus
             this.defaultThemeitem});
             this.generalThemeItem.Image = ((System.Drawing.Image)(resources.GetObject("generalThemeItem.Image")));
             this.generalThemeItem.Name = "generalThemeItem";
-            this.generalThemeItem.Size = new System.Drawing.Size(233, 24);
-            this.generalThemeItem.Text = "GeneralTheme";
+            this.generalThemeItem.Size = new System.Drawing.Size(196, 24);
+            this.generalThemeItem.Text = "Тема";
             // 
             // blackThemeItem
             // 
@@ -576,27 +575,27 @@ namespace NotepadPlusPlus
             // toolStripMenuItem8
             // 
             this.toolStripMenuItem8.Name = "toolStripMenuItem8";
-            this.toolStripMenuItem8.Size = new System.Drawing.Size(230, 6);
+            this.toolStripMenuItem8.Size = new System.Drawing.Size(193, 6);
             // 
             // FullWindowedToolStripMenuItem
             // 
             this.FullWindowedToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("FullWindowedToolStripMenuItem.Image")));
             this.FullWindowedToolStripMenuItem.Name = "FullWindowedToolStripMenuItem";
-            this.FullWindowedToolStripMenuItem.Size = new System.Drawing.Size(233, 24);
+            this.FullWindowedToolStripMenuItem.Size = new System.Drawing.Size(196, 24);
             this.FullWindowedToolStripMenuItem.Text = "Во весь экран";
             this.FullWindowedToolStripMenuItem.Click += new System.EventHandler(this.FullWindowedToolStripMenuItem_Click);
             // 
             // FullWindowedToolStrip
             // 
             this.FullWindowedToolStrip.Name = "FullWindowedToolStrip";
-            this.FullWindowedToolStrip.Size = new System.Drawing.Size(230, 6);
+            this.FullWindowedToolStrip.Size = new System.Drawing.Size(193, 6);
             // 
             // updateWindowToolStripMenuItem
             // 
             this.updateWindowToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("updateWindowToolStripMenuItem.Image")));
             this.updateWindowToolStripMenuItem.Name = "updateWindowToolStripMenuItem";
-            this.updateWindowToolStripMenuItem.Size = new System.Drawing.Size(233, 24);
-            this.updateWindowToolStripMenuItem.Text = "Update Window";
+            this.updateWindowToolStripMenuItem.Size = new System.Drawing.Size(196, 24);
+            this.updateWindowToolStripMenuItem.Text = "Обновить вкладки";
             this.updateWindowToolStripMenuItem.Click += new System.EventHandler(this.UpdateWindowToolStripMenuItem_Click);
             // 
             // compileMenuItem
@@ -715,6 +714,7 @@ namespace NotepadPlusPlus
             this.debugInfo.Name = "debugInfo";
             this.debugInfo.Size = new System.Drawing.Size(147, 24);
             this.debugInfo.Text = "Debug Info";
+            this.debugInfo.Click += new System.EventHandler(this.debugInfo_Click);
             // 
             // toolStripMenuItem6
             // 
@@ -726,6 +726,7 @@ namespace NotepadPlusPlus
             this.aboutPanel.Name = "aboutPanel";
             this.aboutPanel.Size = new System.Drawing.Size(147, 24);
             this.aboutPanel.Text = "About";
+            this.aboutPanel.Click += new System.EventHandler(this.aboutPanel_Click);
             // 
             // toolButtons
             // 
@@ -1011,7 +1012,7 @@ namespace NotepadPlusPlus
             this.tabOption.Location = new System.Drawing.Point(0, 52);
             this.tabOption.Name = "tabOption";
             this.tabOption.SelectedIndex = 0;
-            this.tabOption.Size = new System.Drawing.Size(614, 376);
+            this.tabOption.Size = new System.Drawing.Size(608, 376);
             this.tabOption.TabIndex = 5;
             this.tabOption.SelectedIndexChanged += new System.EventHandler(this.TabOption_SelectedIndexChanged);
             // 
@@ -1036,7 +1037,7 @@ namespace NotepadPlusPlus
             this.recentPages.Location = new System.Drawing.Point(4, 22);
             this.recentPages.Name = "recentPages";
             this.recentPages.Padding = new System.Windows.Forms.Padding(3);
-            this.recentPages.Size = new System.Drawing.Size(606, 350);
+            this.recentPages.Size = new System.Drawing.Size(600, 350);
             this.recentPages.TabIndex = 0;
             this.recentPages.Text = "Untitled";
             this.recentPages.UseVisualStyleBackColor = true;
@@ -1078,7 +1079,7 @@ namespace NotepadPlusPlus
             this.fcbTextBox.RightBracket2 = '}';
             this.fcbTextBox.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(255)))), ((int)(((byte)(69)))), ((int)(((byte)(0)))));
             this.fcbTextBox.ServiceColors = ((FastColoredTextBoxNS.ServiceColors)(resources.GetObject("fcbTextBox.ServiceColors")));
-            this.fcbTextBox.Size = new System.Drawing.Size(600, 344);
+            this.fcbTextBox.Size = new System.Drawing.Size(594, 344);
             this.fcbTextBox.TabIndex = 8;
             this.fcbTextBox.WideCaret = true;
             this.fcbTextBox.Zoom = 100;
@@ -1155,9 +1156,9 @@ namespace NotepadPlusPlus
             // 
             this.panel1.Controls.Add(this.documentMap1);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Right;
-            this.panel1.Location = new System.Drawing.Point(614, 52);
+            this.panel1.Location = new System.Drawing.Point(608, 52);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(184, 376);
+            this.panel1.Size = new System.Drawing.Size(190, 376);
             this.panel1.TabIndex = 9;
             // 
             // documentMap1
@@ -1166,7 +1167,7 @@ namespace NotepadPlusPlus
             this.documentMap1.ForeColor = System.Drawing.Color.Maroon;
             this.documentMap1.Location = new System.Drawing.Point(0, 0);
             this.documentMap1.Name = "documentMap1";
-            this.documentMap1.Size = new System.Drawing.Size(184, 376);
+            this.documentMap1.Size = new System.Drawing.Size(190, 376);
             this.documentMap1.TabIndex = 2;
             this.documentMap1.Target = null;
             this.documentMap1.Text = "documentMap1";
@@ -1204,122 +1205,122 @@ namespace NotepadPlusPlus
         }
 
         #endregion
-        private System.Windows.Forms.OpenFileDialog openFile;
-        private System.Windows.Forms.SaveFileDialog saveFile;
-        private System.Windows.Forms.MenuStrip mainMenu;
-        private System.Windows.Forms.ToolStripMenuItem fileToolMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem newToolItem;
-        private System.Windows.Forms.ToolStripMenuItem saveToolMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem saveAsToolItem;
-        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
-        private System.Windows.Forms.ToolStripMenuItem exitToolItem;
-        private System.Windows.Forms.ToolStrip toolButtons;
-        private System.Windows.Forms.ToolStripButton NewButton;
-        private System.Windows.Forms.ToolStripButton SaveAs;
-        private System.Windows.Forms.ToolStripMenuItem editToolItem;
-        private System.Windows.Forms.ToolStripMenuItem copyToolItem;
-        private System.Windows.Forms.ToolStripMenuItem pasteToolItem;
-        private System.Windows.Forms.ToolStripMenuItem cutToolItem;
-        private System.Windows.Forms.ToolStripMenuItem fontToolItem;
-        private System.Windows.Forms.ToolStripMenuItem fontOptionsMenu;
-        private System.Windows.Forms.FontDialog fontOption;
-        private System.Windows.Forms.ToolStripMenuItem themeToolMenu;
-        private System.Windows.Forms.ToolStripMenuItem backgroundThemeItem;
-        private System.Windows.Forms.ToolStripMenuItem generalThemeItem;
-        private System.Windows.Forms.ColorDialog colorOption;
-        private System.Windows.Forms.ToolStripMenuItem selectToolItem;
-        private System.Windows.Forms.ContextMenuStrip contextOption;
-        private System.Windows.Forms.ToolStripMenuItem copyToolStripMenuItem1;
-        private System.Windows.Forms.ToolStripMenuItem pasteToolStripMenuItem1;
-        private System.Windows.Forms.ToolStripMenuItem selectAllToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem saveToolItem;
-        private System.Windows.Forms.ToolStripButton SaveButton;
-        private System.Windows.Forms.ToolStripButton OpenButton;
-        private System.Windows.Forms.ToolStripMenuItem compileMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem compileCodeMenu;
-        private System.Windows.Forms.ToolStripMenuItem syntaxOption;
-        private System.Windows.Forms.ToolStripMenuItem csharpMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem htmlMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem jsMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem defaultToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem xmlMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem blackThemeItem;
-        private System.Windows.Forms.ToolStripMenuItem hackerThemeItem;
-        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem4;
-        private System.Windows.Forms.ToolStripMenuItem defaultThemeitem;
-        private System.Windows.Forms.TabControl tabOption;
-        private System.Windows.Forms.ToolStripSeparator toolStripButton5;
-        private System.Windows.Forms.ToolStripButton BackButton;
-        private System.Windows.Forms.ToolStripButton ReturnButton;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-        private System.Windows.Forms.ToolStripButton CutButton;
-        private System.Windows.Forms.ToolStripButton CopyButton;
-        private System.Windows.Forms.ToolStripButton SelectAll;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
-        private System.Windows.Forms.ToolStripButton ZoomIn;
-        private System.Windows.Forms.ToolStripButton ZoomOut;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem5;
-        private System.Windows.Forms.ToolStripMenuItem aboutPanel;
-        private System.Windows.Forms.ToolStripMenuItem debugInfo;
-        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem6;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
-        private System.Windows.Forms.ToolStripSeparator separatorForSyntax;
-        private System.Windows.Forms.ToolStripButton printButton;
-        private System.Windows.Forms.StatusStrip statusStrip1;
-        private System.Windows.Forms.ToolStripStatusLabel statusLabel;
-        private System.Windows.Forms.ToolStripStatusLabel rowsInfo;
-        private System.Windows.Forms.ToolStripStatusLabel nameAppLabel;
-        private System.Windows.Forms.ToolStripMenuItem foreColorTheme;
-        private FastColoredTextBoxNS.FastColoredTextBox fcbTextBox;
-        private System.Windows.Forms.TabPage recentPages;
-        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem2;
-        private System.Windows.Forms.ToolStripMenuItem textAlignToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem leftSideToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem middleToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem rightSideToolStripMenuItem;
-        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
-        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel3;
-        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel2;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem3;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem7;
-        private System.Windows.Forms.ToolStripMenuItem JsonMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem PhpMenuItem;
-        private System.Windows.Forms.ContextMenuStrip contextTabMenuStrip;
-        private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
-        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem8;
-        private System.Windows.Forms.ToolStripMenuItem updateWindowToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem selectContextMenu;
-        private System.Windows.Forms.ToolStripMenuItem cutContextMenu;
-        private System.Windows.Forms.ToolStripMenuItem redoContexMenu;
-        private System.Windows.Forms.ToolStripMenuItem undoContextMenu;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem11;
-        private System.Windows.Forms.ToolStripSeparator FullWindowedToolStrip;
-        private System.Windows.Forms.ToolStripMenuItem FullWindowedToolStripMenuItem;
-        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem9;
-        private System.Windows.Forms.ToolStripMenuItem boldToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem italicToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem underLinedToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem strikeOutToolStripItem;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
-        private System.Windows.Forms.ToolStripMenuItem saveIntervalMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem firstToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem secondToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem thirdToolStripMenuItem;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
-        private System.Windows.Forms.ToolStripMenuItem stopToolStripMenuItem;
-        private System.Windows.Forms.Timer timerInterval;
-        private System.Windows.Forms.ToolStripStatusLabel fileStatusStrip;
-        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel4;
-        private System.Windows.Forms.ToolStripMenuItem SyntaxPython;
-        private System.Windows.Forms.ToolStripButton CloseTabPageButton;
-        private System.Windows.Forms.ToolStripMenuItem DeleteToolStripMenu;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem10;
-        private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem12;
-        private System.Windows.Forms.ToolStripMenuItem форматироватьToolStripMenuItem;
-        private FastColoredTextBoxNS.DocumentMap documentMap1;
+        private OpenFileDialog openFile;
+        private SaveFileDialog saveFile;
+        private MenuStrip mainMenu;
+        private ToolStripMenuItem fileToolMenuItem;
+        private ToolStripMenuItem newToolItem;
+        private ToolStripMenuItem saveToolMenuItem;
+        private ToolStripMenuItem saveAsToolItem;
+        private ToolStripSeparator toolStripMenuItem1;
+        private ToolStripMenuItem exitToolItem;
+        private ToolStrip toolButtons;
+        private ToolStripButton NewButton;
+        private ToolStripButton SaveAs;
+        private ToolStripMenuItem editToolItem;
+        private ToolStripMenuItem copyToolItem;
+        private ToolStripMenuItem pasteToolItem;
+        private ToolStripMenuItem cutToolItem;
+        private ToolStripMenuItem fontToolItem;
+        private ToolStripMenuItem fontOptionsMenu;
+        private FontDialog fontOption;
+        private ToolStripMenuItem themeToolMenu;
+        private ToolStripMenuItem backgroundThemeItem;
+        private ToolStripMenuItem generalThemeItem;
+        private ColorDialog colorOption;
+        private ToolStripMenuItem selectToolItem;
+        private ContextMenuStrip contextOption;
+        private ToolStripMenuItem copyToolStripMenuItem1;
+        private ToolStripMenuItem pasteToolStripMenuItem1;
+        private ToolStripMenuItem selectAllToolStripMenuItem;
+        private ToolStripMenuItem saveToolItem;
+        private ToolStripButton SaveButton;
+        private ToolStripButton OpenButton;
+        private ToolStripMenuItem compileMenuItem;
+        private ToolStripMenuItem compileCodeMenu;
+        private ToolStripMenuItem syntaxOption;
+        private ToolStripMenuItem csharpMenuItem;
+        private ToolStripMenuItem htmlMenuItem;
+        private ToolStripMenuItem jsMenuItem;
+        private ToolStripMenuItem defaultToolStripMenuItem;
+        private ToolStripMenuItem xmlMenuItem;
+        private ToolStripMenuItem blackThemeItem;
+        private ToolStripMenuItem hackerThemeItem;
+        private ToolStripSeparator toolStripMenuItem4;
+        private ToolStripMenuItem defaultThemeitem;
+        private TabControl tabOption;
+        private ToolStripSeparator toolStripButton5;
+        private ToolStripButton BackButton;
+        private ToolStripButton ReturnButton;
+        private ToolStripSeparator toolStripSeparator1;
+        private ToolStripButton CutButton;
+        private ToolStripButton CopyButton;
+        private ToolStripButton SelectAll;
+        private ToolStripSeparator toolStripSeparator2;
+        private ToolStripButton ZoomIn;
+        private ToolStripButton ZoomOut;
+        private ToolStripMenuItem toolStripMenuItem5;
+        private ToolStripMenuItem aboutPanel;
+        private ToolStripMenuItem debugInfo;
+        private ToolStripSeparator toolStripMenuItem6;
+        private ToolStripSeparator toolStripSeparator3;
+        private ToolStripSeparator separatorForSyntax;
+        private ToolStripButton printButton;
+        private StatusStrip statusStrip1;
+        private ToolStripStatusLabel statusLabel;
+        private ToolStripStatusLabel rowsInfo;
+        private ToolStripStatusLabel nameAppLabel;
+        private ToolStripMenuItem foreColorTheme;
+        private FastColoredTextBox fcbTextBox;
+        private TabPage recentPages;
+        private ToolStripSeparator toolStripMenuItem2;
+        private ToolStripMenuItem textAlignToolStripMenuItem;
+        private ToolStripMenuItem leftSideToolStripMenuItem;
+        private ToolStripMenuItem middleToolStripMenuItem;
+        private ToolStripMenuItem rightSideToolStripMenuItem;
+        private ToolStripStatusLabel toolStripStatusLabel1;
+        private ToolStripStatusLabel toolStripStatusLabel3;
+        private ToolStripStatusLabel toolStripStatusLabel2;
+        private ToolStripSeparator toolStripSeparator4;
+        private ToolStripMenuItem toolStripMenuItem3;
+        private ToolStripMenuItem toolStripMenuItem7;
+        private ToolStripMenuItem JsonMenuItem;
+        private ToolStripMenuItem PhpMenuItem;
+        private ContextMenuStrip contextTabMenuStrip;
+        private ToolStripMenuItem deleteToolStripMenuItem;
+        private ToolStripSeparator toolStripMenuItem8;
+        private ToolStripMenuItem updateWindowToolStripMenuItem;
+        private ToolStripMenuItem selectContextMenu;
+        private ToolStripMenuItem cutContextMenu;
+        private ToolStripMenuItem redoContexMenu;
+        private ToolStripMenuItem undoContextMenu;
+        private ToolStripSeparator toolStripSeparator5;
+        private ToolStripMenuItem toolStripMenuItem11;
+        private ToolStripSeparator FullWindowedToolStrip;
+        private ToolStripMenuItem FullWindowedToolStripMenuItem;
+        private ToolStripSeparator toolStripMenuItem9;
+        private ToolStripMenuItem boldToolStripMenuItem;
+        private ToolStripMenuItem italicToolStripMenuItem;
+        private ToolStripMenuItem underLinedToolStripMenuItem;
+        private ToolStripMenuItem strikeOutToolStripItem;
+        private ToolStripSeparator toolStripSeparator6;
+        private ToolStripMenuItem saveIntervalMenuItem;
+        private ToolStripMenuItem firstToolStripMenuItem;
+        private ToolStripMenuItem secondToolStripMenuItem;
+        private ToolStripMenuItem thirdToolStripMenuItem;
+        private ToolStripSeparator toolStripSeparator7;
+        private ToolStripMenuItem stopToolStripMenuItem;
+        private Timer timerInterval;
+        private ToolStripStatusLabel fileStatusStrip;
+        private ToolStripStatusLabel toolStripStatusLabel4;
+        private ToolStripMenuItem SyntaxPython;
+        private ToolStripButton CloseTabPageButton;
+        private ToolStripMenuItem DeleteToolStripMenu;
+        private ToolStripMenuItem toolStripMenuItem10;
+        private Panel panel1;
+        private ToolStripSeparator toolStripMenuItem12;
+        private ToolStripMenuItem форматироватьToolStripMenuItem;
+        private DocumentMap documentMap1;
     }
 }
 

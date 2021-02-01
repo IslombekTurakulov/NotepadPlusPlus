@@ -1,29 +1,28 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Printing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using System.IO;
-using System.Runtime.Serialization;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Formatting;
 using Microsoft.CodeAnalysis.Host.Mef;
-using System.Collections.Generic;
-using System.Drawing.Printing;
-using Formatter = Microsoft.CodeAnalysis.Formatting.Formatter;
 
 namespace NotepadPlusPlus
 { 
     public partial class MainForm : Form
     {
         private string _filePath = string.Empty;
-        private readonly List<string> _openedFilesList = new List<string> { };
+        private readonly List<string> _openedFilesList = new List<string>();
         private int _timeleft = 300;
-        private int _newTime = 0;
-        private int _filesNew = 0;
+        private int _newTime;
+        private int _filesNew;
 
-        private int _backupCount = 0;
+        private int _backupCount;
 
         public MainForm()
         {
@@ -58,20 +57,20 @@ namespace NotepadPlusPlus
 
                 if (_timeleft <= 0)
                 {
-                    this.timerInterval.Stop();
-                    string path = $@"backup/BackupMainFormText {this._backupCount++}.rtf";
-                    TabControl.TabPageCollection tabcoll = this.tabOption.TabPages;
+                    timerInterval.Stop();
+                    string path = $@"backup/BackupMainFormText {_backupCount++}.rtf";
+                    TabControl.TabPageCollection tabcoll = tabOption.TabPages;
                     TabPage tb = tabOption.SelectedTab;
 
                     foreach (TabPage tabPage in tabcoll)
                     {
-                        this.SelectedTab().SaveFile(path);
-                        this.SelectedTab().SaveFile(tb.AccessibleDescription);
+                        SelectedTab().SaveFile(path);
+                        SelectedTab().SaveFile(tb.AccessibleDescription);
                         File.AppendAllText("DataHistoryEditor.txt", tb.AccessibleDescription + Environment.NewLine);
                     }
 
-                    this._timeleft = this._newTime;
-                    this.timerInterval.Start();
+                    _timeleft = _newTime;
+                    timerInterval.Start();
                 }
             }
             catch (Exception exception)
@@ -82,8 +81,8 @@ namespace NotepadPlusPlus
 
         public void UpdateDocumentSelectorList()
         {
-            TabControl.TabPageCollection tabcoll = this.tabOption.TabPages;
-            this.treeView1.Nodes.Clear();
+            TabControl.TabPageCollection tabcoll = tabOption.TabPages;
+            treeView1.Nodes.Clear();
             foreach (TabPage tabPage in tabcoll)
             {
                 string fileName = tabPage.Text;
@@ -104,30 +103,31 @@ namespace NotepadPlusPlus
         {
             try
             {
-                this.Text = @"NotePad (PeerGrade Version)";
+                Text = @"NotePad (PeerGrade Version)";
 
                 RichTextBox rtb = new RichTextBox
                 {
                     Dock = DockStyle.Fill,
                     BorderStyle = BorderStyle.None,
-                    ContextMenuStrip = this.contextOption
+                    ContextMenuStrip = contextOption
                 };
 
-                TabPage tb = new TabPage { Text = $@"Untitled ({++this._filesNew})"};
+                TabPage tb = new TabPage { Text = $@"Untitled ({++_filesNew})"};
                 tb.Controls.Add(rtb);
 
 
-                this.tabOption.SelectedTab = tb;
-                this.tabOption.TabPages.Add(tb);
+                tabOption.SelectedTab = tb;
+                tabOption.TabPages.Add(tb);
 
-                var richTextBox1 = tabOption.TabPages[this.tabOption.SelectedIndex].Controls[0];
+                var richTextBox1 = tabOption.TabPages[tabOption.SelectedIndex].Controls[0];
                 richTextBox1.Select();
 
                 UpdateDocumentSelectorList();
                 // add contextmenustrip to richTextBox1
-                richTextBox1.TextChanged += this.RichTextBox_TextChanged;
+                richTextBox1.TextChanged += RichTextBox_TextChanged;
+                richTextBox1.ContextMenuStrip = contextOption;
                 _openedFilesList.Add(tb.Text);
-                this.Text = @"Untitled " + this._filesNew + @" Notepad (Peergrade Version)";
+                Text = @"Untitled " + _filesNew + @" Notepad (Peergrade Version)";
             }
             catch (Exception exception)
             {
@@ -145,25 +145,25 @@ namespace NotepadPlusPlus
                 {
                     Dock = DockStyle.Fill,
                     BorderStyle = BorderStyle.None,
-                    ContextMenuStrip = this.contextOption
+                    ContextMenuStrip = contextOption
                 };
 
-                if (this.openFile.ShowDialog() == DialogResult.OK)
+                if (openFile.ShowDialog() == DialogResult.OK)
                 {
-                    this.tabOption.SelectedTab = tabpage;
+                    tabOption.SelectedTab = tabpage;
                     tabpage.Controls.Add(richText);
-                    this.tabOption.TabPages.Add(tabpage);
-                    if (this.openFile.FileName.Contains(".rtf"))
-                        richText.Rtf = File.ReadAllText(this.openFile.FileName);
+                    tabOption.TabPages.Add(tabpage);
+                    if (openFile.FileName.Contains(".rtf"))
+                        richText.Rtf = File.ReadAllText(openFile.FileName);
                     else
-                        richText.Text = File.ReadAllText(this.openFile.FileName);
+                        richText.Text = File.ReadAllText(openFile.FileName);
 
                     richText.TextChanged += RichTextBox_TextChanged;
-                    tabpage.Text = this.openFile.SafeFileName;
-                    this._filePath = this.openFile.FileName;
-                    this.Text = $@"{this._filePath} NotePad (PeerGrade Version)";
-                    tabpage.AccessibleDescription = this.openFile.FileName;
-                    File.AppendAllText("DataHistoryEditor.txt", this._filePath + Environment.NewLine);
+                    tabpage.Text = openFile.SafeFileName;
+                    _filePath = openFile.FileName;
+                    Text = $@"{_filePath} NotePad (PeerGrade Version)";
+                    tabpage.AccessibleDescription = openFile.FileName;
+                    File.AppendAllText("DataHistoryEditor.txt", _filePath + Environment.NewLine);
                 }
             }
             catch (Exception exception)
@@ -183,7 +183,7 @@ namespace NotepadPlusPlus
                     TabPage tabPage = tabOption.SelectedTab;
                     if (tabPage.Text.Contains("Untitled"))
                     {
-                        TabControl.TabPageCollection tabcoll = this.tabOption.TabPages;
+                        TabControl.TabPageCollection tabcoll = tabOption.TabPages;
                         foreach (TabPage tabpage in tabcoll)
                         {
                             DialogResult dg = MessageBox.Show(
@@ -201,20 +201,20 @@ namespace NotepadPlusPlus
                                 if (!tabpage.Text.Contains("Untitled"))
                                 {
                                     NewFileInterval(tabpage.AccessibleDescription);
-                                    this._filePath = tabpage.AccessibleDescription;
-                                    tabpage.AccessibleDescription = this.openFile.FileName;
-                                    this.Text = $@"{tabpage.AccessibleDescription} NotePad (PeerGrade Version)";
-                                    File.AppendAllText("DataHistoryEditor.txt", this._filePath + Environment.NewLine);
+                                    _filePath = tabpage.AccessibleDescription;
+                                    tabpage.AccessibleDescription = openFile.FileName;
+                                    Text = $@"{tabpage.AccessibleDescription} NotePad (PeerGrade Version)";
+                                    File.AppendAllText("DataHistoryEditor.txt", _filePath + Environment.NewLine);
                                 }
                                 else if (saveFileDialog1.ShowDialog() == DialogResult.OK)
                                 {
                                     NewFileInterval(saveFileDialog1.FileName);
-                                    this.Text = $@"{saveFileDialog1.FileName} NotePad (PeerGrade Version)";
-                                    this.openFile.FileName = saveFileDialog1.FileName;
-                                    tabpage.AccessibleDescription = this.openFile.FileName;
+                                    Text = $@"{saveFileDialog1.FileName} NotePad (PeerGrade Version)";
+                                    openFile.FileName = saveFileDialog1.FileName;
+                                    tabpage.AccessibleDescription = openFile.FileName;
                                     tabpage.Text = openFile.SafeFileName;
-                                    this._filePath = saveFileDialog1.FileName;
-                                    File.AppendAllText("DataHistoryEditor.txt", this._filePath + Environment.NewLine);
+                                    _filePath = saveFileDialog1.FileName;
+                                    File.AppendAllText("DataHistoryEditor.txt", _filePath + Environment.NewLine);
                                 }
                             }
                             else if (dg == DialogResult.Cancel)
@@ -228,8 +228,8 @@ namespace NotepadPlusPlus
                     else
                     {
                         NewFileInterval(path: tabPage.AccessibleDescription);
-                        this.Text = $@"{tabPage.AccessibleDescription} NotePad (PeerGrade Version)";
-                        File.AppendAllText("DataHistoryEditor.txt", this._filePath + Environment.NewLine);
+                        Text = $@"{tabPage.AccessibleDescription} NotePad (PeerGrade Version)";
+                        File.AppendAllText("DataHistoryEditor.txt", _filePath + Environment.NewLine);
                     }
                 }
             }
@@ -239,12 +239,12 @@ namespace NotepadPlusPlus
             }
         }
 
-        private void SaveFileButton(object sender, EventArgs e) => this.SaveFile_Click(sender, e);
+        private void SaveFileButton(object sender, EventArgs e) => SaveFile_Click(sender, e);
 
         private RichTextBox SelectedTab()
         {
             RichTextBox richTextBox = null;
-                TabPage tabpage = this.tabOption.SelectedTab;
+                TabPage tabpage = tabOption.SelectedTab;
                 foreach (var c in tabpage.Controls)
                     if (c is RichTextBox box)
                         richTextBox = box;
@@ -269,7 +269,7 @@ namespace NotepadPlusPlus
                         if (saveFileDialog1.ShowDialog() == DialogResult.OK)
                         {
                             NewFileInterval(saveFileDialog1.FileName);
-                            this.Text = $@"{saveFileDialog1.FileName} NotePad (PeerGrade Version)";
+                            Text = $@"{saveFileDialog1.FileName} NotePad (PeerGrade Version)";
                             openFile.FileName = saveFileDialog1.FileName;
                             tabPage.Text = openFile.SafeFileName;
                             tabPage.AccessibleDescription = saveFileDialog1.FileName;
@@ -286,7 +286,7 @@ namespace NotepadPlusPlus
                         if (saveFileDialog1.ShowDialog() == DialogResult.OK)
                         {
                             NewFileInterval(saveFileDialog1.FileName);
-                            this.Text = $@"{saveFileDialog1.FileName} NotePad (PeerGrade Version)";
+                            Text = $@"{saveFileDialog1.FileName} NotePad (PeerGrade Version)";
                             openFile.FileName = saveFileDialog1.FileName;
                             tabPage.Text = openFile.SafeFileName;
                             tabPage.AccessibleDescription = saveFileDialog1.FileName;
@@ -302,11 +302,11 @@ namespace NotepadPlusPlus
 
         private void ExitTool_Click(object sender, EventArgs e) => Application.Exit();
 
-        private void NewFile_Button(object sender, EventArgs e) => this.NewFile_Click(sender, e);
+        private void NewFile_Button(object sender, EventArgs e) => NewFile_Click(sender, e);
 
-        private void OpenFile_Button(object sender, EventArgs e) => this.OpenFile_Click(sender, e);
+        private void OpenFile_Button(object sender, EventArgs e) => OpenFile_Click(sender, e);
 
-        private void SaveAs_Button(object sender, EventArgs e) => this.SaveAsFile_Click(sender, e);
+        private void SaveAs_Button(object sender, EventArgs e) => SaveAsFile_Click(sender, e);
 
         private void CopyText_Click(object sender, EventArgs e)
         {
@@ -330,8 +330,9 @@ namespace NotepadPlusPlus
         {
             try
             {
-                this.fontOption.ShowDialog();
-                SelectedTab().Font = this.fontOption.Font;
+                fontOption.ShowDialog();
+                SelectedTab().Font = fontOption.Font;
+                SelectedTab().ForeColor = fontOption.Color;
             }
             catch (Exception exception)
             {
@@ -343,8 +344,8 @@ namespace NotepadPlusPlus
         {
             try
             {
-                this.colorOption.ShowDialog();
-                SelectedTab().BackColor = this.colorOption.Color;
+                colorOption.ShowDialog();
+                SelectedTab().BackColor = colorOption.Color;
             }
             catch (Exception exception)
             {
@@ -357,11 +358,11 @@ namespace NotepadPlusPlus
             if (SelectedTab().TextLength > 0)
                 SelectedTab().SelectAll();
         }
-        private void CopyTextMenu_Click(object sender, EventArgs e) => this.CopyText_Click(sender, e);
+        private void CopyTextMenu_Click(object sender, EventArgs e) => CopyText_Click(sender, e);
 
-        private void PasteMenu_Click(object sender, EventArgs e) => this.PasteText_Click(sender, e);
+        private void PasteMenu_Click(object sender, EventArgs e) => PasteText_Click(sender, e);
 
-        private void CutMenu_Click(object sender, EventArgs e) => this.CutText_Click(sender, e);
+        private void CutMenu_Click(object sender, EventArgs e) => CutText_Click(sender, e);
 
         private void SelectAllMenu_Click(object sender, EventArgs e)
         {
@@ -382,37 +383,37 @@ namespace NotepadPlusPlus
         {
             ColorTheme colorTheme = new ColorTheme();
             colorTheme.ColorChangerMainForm(mainMenu, fastToolButton, statusTextEditor, tabOption,SelectedTab(), treeView1, Color.Black, Color.White);
-            this.BackColor = Color.Black;
+            BackColor = Color.Black;
         }
 
         private void HackerTheme_Click(object sender, EventArgs e)
         {
             ColorTheme colorTheme = new ColorTheme();
             colorTheme.ColorChangerMainForm(mainMenu, fastToolButton, statusTextEditor, tabOption,SelectedTab(), treeView1,Color.Black, Color.LawnGreen);
-            this.BackColor = Color.Black; 
+            BackColor = Color.Black; 
         }
 
         private void DefaultTheme_Click(object sender, EventArgs e)
         {
             ColorTheme colorTheme = new ColorTheme();
             colorTheme.ColorChangerMainForm(mainMenu, fastToolButton, statusTextEditor, tabOption,SelectedTab(), treeView1, DefaultBackColor, DefaultForeColor);
-            this.BackColor = DefaultBackColor;
+            BackColor = DefaultBackColor;
         }
 
 
 
-        private void BackButton_Click(object sender, EventArgs e) => this.UndoToolStripMenu_Click(sender, e);
+        private void BackButton_Click(object sender, EventArgs e) => UndoToolStripMenu_Click(sender, e);
 
         private void ReturnButton_Click(object sender, EventArgs e)
         {
             SelectedTab().Redo();
         }
 
-        private void CutButton_Click(object sender, EventArgs e) => this.CutMenu_Click(sender, e);
+        private void CutButton_Click(object sender, EventArgs e) => CutMenu_Click(sender, e);
 
-        private void CopyButton_Click(object sender, EventArgs e) => this.CopyTextMenu_Click(sender, e);
+        private void CopyButton_Click(object sender, EventArgs e) => CopyTextMenu_Click(sender, e);
 
-        private void SelectAll_Click(object sender, EventArgs e) => this.SelectAllMenu_Click(sender, e);
+        private void SelectAll_Click(object sender, EventArgs e) => SelectAllMenu_Click(sender, e);
 
         private void ZoomIn_Click(object sender, EventArgs e)
         {
@@ -435,10 +436,10 @@ namespace NotepadPlusPlus
         {
             try
             {
-                if (this.SelectedTab().ZoomFactor < 2)
-                    this.SelectedTab().ZoomFactor = 0;
+                if (SelectedTab().ZoomFactor < 2)
+                    SelectedTab().ZoomFactor = 0;
                 else
-                    this.SelectedTab().ZoomFactor -= 2;
+                    SelectedTab().ZoomFactor -= 2;
             }
             catch (Exception exception)
             {
@@ -448,18 +449,18 @@ namespace NotepadPlusPlus
 
         private void ForeColorTheme_Click(object sender, EventArgs e)
         {
-            this.colorOption.ShowDialog();
-            this.SelectedTab().ForeColor = this.colorOption.Color;
+            colorOption.ShowDialog();
+            SelectedTab().ForeColor = colorOption.Color;
         }
 
         private void RichTextBox_TextChanged(object sender, EventArgs e)
         {
             try
             {
-                string text = this.SelectedTab().Text;
+                string text = SelectedTab().Text;
                 string[] lines = text.Split('\n');
-                this.statusLabel.Text = $@"Символов: {text.Length}";
-                this.rowsInfo.Text = $@"Строк: {lines.Length}";
+                statusLabel.Text = $@"Символов: {text.Length}";
+                rowsInfo.Text = $@"Строк: {lines.Length}";
             }
             catch (Exception exception)
             {
@@ -467,7 +468,7 @@ namespace NotepadPlusPlus
             }
         }
 
-        private void FontOptionButton_Click(object sender, EventArgs e) => this.FontOption_Click(sender, e);
+        private void FontOptionButton_Click(object sender, EventArgs e) => FontOption_Click(sender, e);
 
         private void CsharpEditor_Click(object sender, EventArgs e)
         {
@@ -476,19 +477,19 @@ namespace NotepadPlusPlus
         }
 
 
-        private void BoldToolButton_Click(object sender, EventArgs e) => this.BoldToolStripMenuItem_Click(sender, e);
+        private void BoldToolButton_Click(object sender, EventArgs e) => BoldToolStripMenuItem_Click(sender, e);
 
-        private void UnderlineToolButton_Click(object sender, EventArgs e) => this.UnderLinedToolStripMenuItem_Click(sender, e);
+        private void UnderlineToolButton_Click(object sender, EventArgs e) => UnderLinedToolStripMenuItem_Click(sender, e);
 
-        private void ItalicToolButton_Click(object sender, EventArgs e) => this.ItalicToolStripMenuItem_Click(sender, e);
+        private void ItalicToolButton_Click(object sender, EventArgs e) => ItalicToolStripMenuItem_Click(sender, e);
 
         private void BoldToolStripMenuItem_Click(object sender, EventArgs e)
         {
             try
             {
-                this.SelectedTab().SelectionFont = new Font(
-                    this.SelectedTab().SelectionFont,
-                    FontStyle.Bold ^ this.SelectedTab().SelectionFont.Style);
+                SelectedTab().SelectionFont = new Font(
+                    SelectedTab().SelectionFont,
+                    FontStyle.Bold ^ SelectedTab().SelectionFont.Style);
             }
             catch (Exception exception)
             {
@@ -500,9 +501,9 @@ namespace NotepadPlusPlus
         {
             try
             {
-                this.SelectedTab().SelectionFont = new Font(
-                    this.SelectedTab().SelectionFont,
-                    FontStyle.Italic ^ this.SelectedTab().SelectionFont.Style);
+                SelectedTab().SelectionFont = new Font(
+                    SelectedTab().SelectionFont,
+                    FontStyle.Italic ^ SelectedTab().SelectionFont.Style);
             }
             catch (Exception exception)
             {
@@ -514,9 +515,9 @@ namespace NotepadPlusPlus
         {
             try
             {
-                this.SelectedTab().SelectionFont = new Font(
-                    this.SelectedTab().SelectionFont,
-                    FontStyle.Underline ^ this.SelectedTab().SelectionFont.Style);
+                SelectedTab().SelectionFont = new Font(
+                    SelectedTab().SelectionFont,
+                    FontStyle.Underline ^ SelectedTab().SelectionFont.Style);
             }
             catch (Exception exception)
             {
@@ -528,9 +529,9 @@ namespace NotepadPlusPlus
         {
             try
             {
-                this.SelectedTab().SelectionFont = new Font(
-                    this.SelectedTab().SelectionFont,
-                    FontStyle.Strikeout ^ this.SelectedTab().SelectionFont.Style);
+                SelectedTab().SelectionFont = new Font(
+                    SelectedTab().SelectionFont,
+                    FontStyle.Strikeout ^ SelectedTab().SelectionFont.Style);
             }
             catch (Exception exception)
             {
@@ -543,7 +544,7 @@ namespace NotepadPlusPlus
         /// </param>
         /// <param name="e"> The e.
         /// </param>
-        private void UndoToolStripMenu_Click(object sender, EventArgs e) => this.SelectedTab().Undo();
+        private void UndoToolStripMenu_Click(object sender, EventArgs e) => SelectedTab().Undo();
 
         /// <summary>
         /// The tool strip redo item
@@ -554,7 +555,7 @@ namespace NotepadPlusPlus
         /// <param name="e">
         /// The e.
         /// </param>
-        private void RedoToolStripMenuItem_Click(object sender, EventArgs e) => this.SelectedTab().Redo();
+        private void RedoToolStripMenuItem_Click(object sender, EventArgs e) => SelectedTab().Redo();
 
         private void PrintButton_Click(object sender, EventArgs e)
         {
@@ -577,41 +578,41 @@ namespace NotepadPlusPlus
         }
 
 
-        private void LeftSideToolStripMenuItem_Click(object sender, EventArgs e) => this.SelectedTab().SelectionAlignment = HorizontalAlignment.Left;
+        private void LeftSideToolStripMenuItem_Click(object sender, EventArgs e) => SelectedTab().SelectionAlignment = HorizontalAlignment.Left;
 
-        private void MiddleToolStripMenuItem_Click(object sender, EventArgs e) => this.SelectedTab().SelectionAlignment = HorizontalAlignment.Center;
+        private void MiddleToolStripMenuItem_Click(object sender, EventArgs e) => SelectedTab().SelectionAlignment = HorizontalAlignment.Center;
 
-        private void RightSideToolStripMenuItem_Click(object sender, EventArgs e) => this.SelectedTab().SelectionAlignment = HorizontalAlignment.Right;
+        private void RightSideToolStripMenuItem_Click(object sender, EventArgs e) => SelectedTab().SelectionAlignment = HorizontalAlignment.Right;
 
         private void FirstTimeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this._timeleft = 300;
-            this.saveIntervalMenuItem.ShortcutKeyDisplayString = "ON";
+            _timeleft = 300;
+            saveIntervalMenuItem.ShortcutKeyDisplayString = "ON";
             timerInterval.Stop();
             TimerStart();
         }
 
         private void SecondTimeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this._timeleft = 600;
-            this.saveIntervalMenuItem.ShortcutKeyDisplayString = "ON";
+            _timeleft = 600;
+            saveIntervalMenuItem.ShortcutKeyDisplayString = "ON";
             timerInterval.Stop();
             TimerStart();
         }
 
         private void ThirdTimeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this._timeleft = 1200;
-            this.saveIntervalMenuItem.ShortcutKeyDisplayString = "ON";
+            _timeleft = 1200;
+            saveIntervalMenuItem.ShortcutKeyDisplayString = "ON";
             timerInterval.Stop();
             TimerStart();
         }
 
         private void StopToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.timerInterval.Stop();
-            this.saveIntervalMenuItem.ShortcutKeyDisplayString = "OFF";
-            this._timeleft = 0;
+            timerInterval.Stop();
+            saveIntervalMenuItem.ShortcutKeyDisplayString = "OFF";
+            _timeleft = 0;
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -626,20 +627,21 @@ namespace NotepadPlusPlus
                         tabOption.SelectedTab = tabpage;
                         if (tabpage.Text.Contains("Untitled"))
                         {
-                            this.SaveFile_Click(sender, e);
+                            SaveFile_Click(sender, e);
                             break;
                         }
                         tabOption.TabPages.Remove(tabpage);
-                        this.TabOption_SelectedIndexChanged(sender, e);
+                        TabOption_SelectedIndexChanged(sender, e);
                         
 
                         _filePath = tabpage.AccessibleDescription;
                         string[] arrPages = File.ReadAllLines("DataHistoryEditor.txt");
                         for (int i = 0; i < arrPages.Length; i++)
                             if (!arrPages[i].Contains(_filePath))
-                                File.AppendAllText("DataHistoryEditor.txt", this._filePath + Environment.NewLine);
+                                File.AppendAllText("DataHistoryEditor.txt", _filePath + Environment.NewLine);
                     }
                 }
+                File.AppendAllText("DebugLog.txt", $"[{DateTime.UtcNow}] Closing MainForm {Environment.NewLine}");
 
             }
             catch (Exception exception)
@@ -650,12 +652,12 @@ namespace NotepadPlusPlus
 
         void TimerStart()
         {
-            this._newTime = this._timeleft;
-            this.timerInterval.Interval = 1000;
-            this.timerInterval.Start();
-            this.saveIntervalMenuItem.ShortcutKeyDisplayString = "ON";
-            this.timerInterval.Tick += Timer_Tick;
-            this.timerInterval.Start();
+            _newTime = _timeleft;
+            timerInterval.Interval = 1000;
+            timerInterval.Start();
+            saveIntervalMenuItem.ShortcutKeyDisplayString = "ON";
+            timerInterval.Tick += Timer_Tick;
+            timerInterval.Start();
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -672,33 +674,37 @@ namespace NotepadPlusPlus
                 {
                     for (int i = 0; i < arrPages.Length; i++)
                     {
+                        var sent = arrPages[i].Trim(' ').Split(' ').Distinct(StringComparer.CurrentCultureIgnoreCase);
+                        File.WriteAllLines("DataHistoryEditor.txt", sent);
                         RichTextBox fctText = new RichTextBox
                         {
                             Dock = DockStyle.Fill,
                             BorderStyle = BorderStyle.None,
-                            ContextMenuStrip = this.contextOption
+                            ContextMenuStrip = contextOption
                         };
-                        this.openFile.FileName = arrPages[i];
+                        openFile.FileName = arrPages[i];
                         if (openFile.CheckFileExists)
                         {
                             if (arrPages[i].Contains(".rtf"))
                                 fctText.Rtf = File.ReadAllText(arrPages[i]);
                             else
                                 fctText.Text = File.ReadAllText(arrPages[i]);
-                            TabPage tabpage = new TabPage()
+
+                            TabPage tabpage = new TabPage
                             {
                                 Controls = { fctText },
                                 Text = openFile.SafeFileName,
                                 AccessibleDescription = openFile.FileName,
                                 ContextMenuStrip = tabControlContextMenu
                             };
-                            this.tabOption.SelectedTab = tabpage;
-                            this.tabOption.TabPages.Add(tabpage);
+                            tabOption.SelectedTab = tabpage;
+                            tabOption.TabPages.Add(tabpage);
                         }
                         UpdateDocumentSelectorList();
                     }
+                    tabOption.ContextMenuStrip = tabControlContextMenu;
+                    File.AppendAllText("DebugLog.txt", $"[{DateTime.UtcNow}] Opening MainForm {Environment.NewLine}");
                 }
-                this.tabOption.ContextMenuStrip = this.tabControlContextMenu;
             }
             catch (Exception exception)
             {
@@ -710,8 +716,8 @@ namespace NotepadPlusPlus
         {
             try
             {
-                if (this.SelectedTab().TextLength > 0)
-                    this.SelectedTab().Select();
+                if (SelectedTab().TextLength > 0)
+                    SelectedTab().Select();
             }
             catch (Exception exception)
             {
@@ -723,8 +729,8 @@ namespace NotepadPlusPlus
         {
             try
             {
-                if (this.SelectedTab().TextLength > 0)
-                    this.SelectedTab().SelectedText = string.Empty;
+                if (SelectedTab().TextLength > 0)
+                    SelectedTab().SelectedText = string.Empty;
             }
             catch (Exception exception)
             {
@@ -732,11 +738,11 @@ namespace NotepadPlusPlus
             }
         }
 
-        private void UndoContextMenu_Click(object sender, EventArgs e) => this.UndoToolStripMenu_Click(sender, e);
+        private void UndoContextMenu_Click(object sender, EventArgs e) => UndoToolStripMenu_Click(sender, e);
 
-        private void RedoContexMenu_Click(object sender, EventArgs e) => this.RedoToolStripMenuItem_Click(sender, e);
+        private void RedoContexMenu_Click(object sender, EventArgs e) => RedoToolStripMenuItem_Click(sender, e);
 
-        private void DeleteToolStripMenu_Click(object sender, EventArgs e) => this.DeleteToolStrip_Click(sender, e);
+        private void DeleteToolStripMenu_Click(object sender, EventArgs e) => DeleteToolStrip_Click(sender, e);
 
         private void DeleteToolStrip_Click(object sender, EventArgs e)
         {
@@ -744,15 +750,15 @@ namespace NotepadPlusPlus
             {
                 if (tabOption.TabCount > 1)
                 {
-                    var newIndex = this.tabOption.TabPages.IndexOf(this.tabOption.SelectedTab) - 1;
+                    var newIndex = tabOption.TabPages.IndexOf(tabOption.SelectedTab) - 1;
 
-                    this.tabOption.TabPages.Remove(this.tabOption.SelectedTab);
-                    if (this.tabOption.TabPages.Count != 0)
-                        this.tabOption.SelectedTab = this.tabOption.TabPages[Math.Max(newIndex, 0)];
+                    tabOption.TabPages.Remove(tabOption.SelectedTab);
+                    if (tabOption.TabPages.Count != 0)
+                        tabOption.SelectedTab = tabOption.TabPages[Math.Max(newIndex, 0)];
 
-                    if (this._openedFilesList.Count != 1)
-                        this._openedFilesList.RemoveAt(newIndex);
-                    this.UpdateDocumentSelectorList();
+                    if (_openedFilesList.Count != 1)
+                        _openedFilesList.RemoveAt(newIndex);
+                    UpdateDocumentSelectorList();
                 }
             }
             catch (Exception exception)
@@ -761,15 +767,15 @@ namespace NotepadPlusPlus
             }
         }
 
-        private void UpdateWindowToolStripMenuItem_Click(object sender, EventArgs e) => this.UpdateWindow();
+        private void UpdateWindowToolStripMenuItem_Click(object sender, EventArgs e) => UpdateWindow();
 
-        private void FullWindowedToolStrip_Click(object sender, EventArgs e) => this.WindowState = FormWindowState.Maximized;
+        private void FullWindowedToolStrip_Click(object sender, EventArgs e) => WindowState = FormWindowState.Maximized;
 
         private void UpdateWindow()
         {
             try
             {
-                TabControl.TabPageCollection tabcoll = this.tabOption.TabPages;
+                TabControl.TabPageCollection tabcoll = tabOption.TabPages;
 
                 foreach (TabPage tabpage in tabcoll)
                 {
@@ -781,9 +787,9 @@ namespace NotepadPlusPlus
                     else
                         menuitem.Checked = false;
 
-                    this.Invalidate();
+                    Invalidate();
 
-                    menuitem.Click += this.WindowList;
+                    menuitem.Click += WindowList;
                 }
             }
             catch (Exception exception)
@@ -797,7 +803,7 @@ namespace NotepadPlusPlus
             try
             {
                 ToolStripItem toolstripitem = (ToolStripItem)sender;
-                TabControl.TabPageCollection tabcoll = this.tabOption.TabPages;
+                TabControl.TabPageCollection tabcoll = tabOption.TabPages;
                 foreach (TabPage tb in tabcoll)
                 {
                     if (toolstripitem.Text == tb.Text)
@@ -806,7 +812,7 @@ namespace NotepadPlusPlus
 
                         var richTextBox1 = tabOption.TabPages[tabOption.SelectedIndex].Controls[0];
                         richTextBox1.Select();
-                        this.UpdateWindow();
+                        UpdateWindow();
                     }
                 }
             }
@@ -822,7 +828,7 @@ namespace NotepadPlusPlus
             {
                 if (tabOption.TabCount > 0)
                 {
-                    TabPage tabpage = this.tabOption.SelectedTab;
+                    TabPage tabpage = tabOption.SelectedTab;
 
                     foreach (string filename in _openedFilesList)
                     {
@@ -833,18 +839,18 @@ namespace NotepadPlusPlus
                             {
                                 string str2 = tabpage.Text.Remove(tabpage.Text.Length - 1);
                                 if (str == str2)
-                                    this.Text = $@"{tabpage.Text}" + " Notepad (Peergrade Version)";
+                                    Text = $@"{tabpage.Text}" + " Notepad (Peergrade Version)";
                             }
 
                             else
                             {
                                 if (str == tabpage.Text)
-                                    this.Text = $@"{tabpage.Text}" + " Notepad (Peergrade Version)";
+                                    Text = $@"{tabpage.Text}" + " Notepad (Peergrade Version)";
                             }
                         }
                     }
 
-                    this.UpdateWindow();
+                    UpdateWindow();
                 }
             }
             catch (Exception exception)
@@ -853,7 +859,7 @@ namespace NotepadPlusPlus
             }
         }
 
-        private void WikipediaToolStripMenuItem_Click(object sender, EventArgs e) => System.Diagnostics.Process.Start("https://en.wikipedia.org/wiki/Higher_School_of_Economics");
+        private void WikipediaToolStripMenuItem_Click(object sender, EventArgs e) => Process.Start("https://en.wikipedia.org/wiki/Higher_School_of_Economics");
 
         private void CloseTabPageButton_Click(object sender, EventArgs e) => DeleteToolStripMenuItem_Click(sender, e);
 
@@ -865,5 +871,11 @@ namespace NotepadPlusPlus
         }
 
         private void StrikeOutButtonStrip_Click(object sender, EventArgs e) => StrikeOutToolStripItem_Click(sender, e);
+
+        private void aboutPanel_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Build version: " + ProductVersion);
+        }
+
     }
 }

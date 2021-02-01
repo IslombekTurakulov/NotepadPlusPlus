@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Drawing;
 using System.Windows.Forms;
 using FastColoredTextBoxNS;
 
@@ -30,6 +25,7 @@ namespace NotepadPlusPlus
             statusText.BackColor = backColor;
             statusText.ForeColor = foreColor;
             tabpage.BorderStyle = BorderStyle.None;
+            tabpage.BackColor = backColor;
         }
 
         public void ColorChangerDeveloperForm(MenuStrip mainMenu,
@@ -41,15 +37,20 @@ namespace NotepadPlusPlus
             Color foreColor)
         {
             TabPage tabpage = tabOption.SelectedTab;
+            tabpage.BorderStyle = BorderStyle.None;
+            tabpage.BackColor = backColor;
             mainMenu.BackColor = backColor;
             mainMenu.ForeColor = foreColor;
+            tabOption.BackColor = backColor;
+            tabOption.ForeColor = foreColor;
             fastToolButton.BackColor = backColor;
             fastToolButton.ForeColor = foreColor;
             fastColoredTextBox.BackColor = backColor;
             fastColoredTextBox.ForeColor = foreColor;
+            fastColoredTextBox.IndentBackColor = backColor;
+            fastColoredTextBox.LineNumberColor = foreColor;
             statusText.BackColor = backColor;
             statusText.ForeColor = foreColor;
-            tabpage.BorderStyle = BorderStyle.None;
         }
     }
 }
