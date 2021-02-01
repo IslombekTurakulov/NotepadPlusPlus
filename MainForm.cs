@@ -13,7 +13,7 @@ using Microsoft.CodeAnalysis.Formatting;
 using Microsoft.CodeAnalysis.Host.Mef;
 
 namespace NotepadPlusPlus
-{ 
+{
     public partial class MainForm : Form
     {
         private string _filePath = string.Empty;
@@ -112,7 +112,7 @@ namespace NotepadPlusPlus
                     ContextMenuStrip = contextOption
                 };
 
-                TabPage tb = new TabPage { Text = $@"Untitled ({++_filesNew})"};
+                TabPage tb = new TabPage { Text = $@"Untitled ({++_filesNew})" };
                 tb.Controls.Add(rtb);
 
 
@@ -172,7 +172,7 @@ namespace NotepadPlusPlus
             }
         }
 
-      
+
 
         private void SaveFile_Click(object sender, EventArgs e)
         {
@@ -244,11 +244,11 @@ namespace NotepadPlusPlus
         private RichTextBox SelectedTab()
         {
             RichTextBox richTextBox = null;
-                TabPage tabpage = tabOption.SelectedTab;
-                foreach (var c in tabpage.Controls)
-                    if (c is RichTextBox box)
-                        richTextBox = box;
-                return richTextBox;
+            TabPage tabpage = tabOption.SelectedTab;
+            foreach (var c in tabpage.Controls)
+                if (c is RichTextBox box)
+                    richTextBox = box;
+            return richTextBox;
         }
 
         private void SaveAsFile_Click(object sender, EventArgs e)
@@ -382,21 +382,21 @@ namespace NotepadPlusPlus
         private void BlackTheme_Click(object sender, EventArgs e)
         {
             ColorTheme colorTheme = new ColorTheme();
-            colorTheme.ColorChangerMainForm(mainMenu, fastToolButton, statusTextEditor, tabOption,SelectedTab(), treeView1, Color.Black, Color.White);
+            colorTheme.ColorChangerMainForm(mainMenu, fastToolButton, statusTextEditor, tabOption, SelectedTab(), treeView1, Color.Black, Color.White);
             BackColor = Color.Black;
         }
 
         private void HackerTheme_Click(object sender, EventArgs e)
         {
             ColorTheme colorTheme = new ColorTheme();
-            colorTheme.ColorChangerMainForm(mainMenu, fastToolButton, statusTextEditor, tabOption,SelectedTab(), treeView1,Color.Black, Color.LawnGreen);
-            BackColor = Color.Black; 
+            colorTheme.ColorChangerMainForm(mainMenu, fastToolButton, statusTextEditor, tabOption, SelectedTab(), treeView1, Color.Black, Color.LawnGreen);
+            BackColor = Color.Black;
         }
 
         private void DefaultTheme_Click(object sender, EventArgs e)
         {
             ColorTheme colorTheme = new ColorTheme();
-            colorTheme.ColorChangerMainForm(mainMenu, fastToolButton, statusTextEditor, tabOption,SelectedTab(), treeView1, DefaultBackColor, DefaultForeColor);
+            colorTheme.ColorChangerMainForm(mainMenu, fastToolButton, statusTextEditor, tabOption, SelectedTab(), treeView1, DefaultBackColor, DefaultForeColor);
             BackColor = DefaultBackColor;
         }
 
@@ -632,13 +632,18 @@ namespace NotepadPlusPlus
                         }
                         tabOption.TabPages.Remove(tabpage);
                         TabOption_SelectedIndexChanged(sender, e);
-                        
+
 
                         _filePath = tabpage.AccessibleDescription;
+                        IEnumerable<string> sent = new[] {string.Empty};
                         string[] arrPages = File.ReadAllLines("DataHistoryEditor.txt");
                         for (int i = 0; i < arrPages.Length; i++)
-                            if (!arrPages[i].Contains(_filePath))
-                                File.AppendAllText("DataHistoryEditor.txt", _filePath + Environment.NewLine);
+                        {
+                            sent = arrPages[i].Split(' ')
+                               .Distinct(StringComparer.CurrentCultureIgnoreCase);
+                        }
+                        File.WriteAllLines("DataHistoryEditor.txt", sent);
+                        File.AppendAllText("DataHistoryEditor.txt", _filePath + Environment.NewLine);
                     }
                 }
                 File.AppendAllText("DebugLog.txt", $"[{DateTime.UtcNow}] Closing MainForm {Environment.NewLine}");
@@ -664,46 +669,60 @@ namespace NotepadPlusPlus
         {
             try
             {
-                string[] arrPages = File.ReadAllLines("DataHistoryEditor.txt");
-                TimerStart();
-                if (tabOption.TabCount == 0)
+                string path = "DataHistoryEditor.txt";
+                string debugLog = "DebugLog.txt";
+                if (!File.Exists(path))
+                    File.Create(path);
+                else
                 {
-                    NewFile_Click(sender, e);
-                }
-                if (arrPages.Length >= 1)
-                {
-                    for (int i = 0; i < arrPages.Length; i++)
+                    string[] arrPages = File.ReadAllLines(path);
+                    TimerStart();
+                    if (tabOption.TabCount == 0)
                     {
-                        var sent = arrPages[i].Trim(' ').Split(' ').Distinct(StringComparer.CurrentCultureIgnoreCase);
-                        File.WriteAllLines("DataHistoryEditor.txt", sent);
-                        RichTextBox fctText = new RichTextBox
-                        {
-                            Dock = DockStyle.Fill,
-                            BorderStyle = BorderStyle.None,
-                            ContextMenuStrip = contextOption
-                        };
-                        openFile.FileName = arrPages[i];
-                        if (openFile.CheckFileExists)
-                        {
-                            if (arrPages[i].Contains(".rtf"))
-                                fctText.Rtf = File.ReadAllText(arrPages[i]);
-                            else
-                                fctText.Text = File.ReadAllText(arrPages[i]);
-
-                            TabPage tabpage = new TabPage
-                            {
-                                Controls = { fctText },
-                                Text = openFile.SafeFileName,
-                                AccessibleDescription = openFile.FileName,
-                                ContextMenuStrip = tabControlContextMenu
-                            };
-                            tabOption.SelectedTab = tabpage;
-                            tabOption.TabPages.Add(tabpage);
-                        }
-                        UpdateDocumentSelectorList();
+                        NewFile_Click(sender, e);
                     }
-                    tabOption.ContextMenuStrip = tabControlContextMenu;
-                    File.AppendAllText("DebugLog.txt", $"[{DateTime.UtcNow}] Opening MainForm {Environment.NewLine}");
+
+                    if (arrPages.Length >= 1)
+                    {
+                        for (int i = 0; i < arrPages.Length; i++)
+                        {
+                            RichTextBox fctText = new RichTextBox
+                            {
+                                Dock = DockStyle.Fill,
+                                BorderStyle = BorderStyle.None,
+                                ContextMenuStrip = contextOption
+                            };
+                            openFile.FileName = arrPages[i];
+                            if (openFile.CheckFileExists)
+                            {
+                                if (arrPages[i].Contains(".rtf"))
+                                    fctText.Rtf = File.ReadAllText(arrPages[i]);
+                                else
+                                    fctText.Text = File.ReadAllText(arrPages[i]);
+
+                                TabPage tabpage = new TabPage
+                                {
+                                    Controls = { fctText },
+                                    Text = openFile.SafeFileName,
+                                    AccessibleDescription = openFile.FileName,
+                                    ContextMenuStrip = tabControlContextMenu
+                                };
+                                tabOption.SelectedTab = tabpage;
+                                tabOption.TabPages.Add(tabpage);
+                            }
+
+                            UpdateDocumentSelectorList();
+                        }
+
+                        tabOption.ContextMenuStrip = tabControlContextMenu;
+                        if (File.Exists(debugLog))
+                            File.AppendAllText("DebugLog.txt", $"[{DateTime.UtcNow}] Opening MainForm {Environment.NewLine}");
+                        else
+                        {
+                            File.Create(debugLog);
+                            File.AppendAllText("DebugLog.txt", $"[{DateTime.UtcNow}] Opening MainForm {Environment.NewLine}");
+                        }
+                    }
                 }
             }
             catch (Exception exception)

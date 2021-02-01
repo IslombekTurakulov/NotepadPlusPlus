@@ -131,52 +131,48 @@ namespace NotepadPlusPlus
 
         private void StatusFileDetector()
         {
-            if (_filePath.Contains("."))
-            {
-                fileStatusStrip.Text = " Файл "; ;
-                SelectedPageTextBox().Language = Language.Custom;
-            }
-            if (_filePath.Contains(".cs"))
+            TabPage tabPage = tabOption.SelectedTab;
+            if (tabPage.Text.Contains(".cs"))
             {
                 fileStatusStrip.Text = " C# Файл ";
                 SelectedPageTextBox().Language = Language.CSharp;
             }
-            if (_filePath.Contains(".js"))
+            if (tabPage.Text.Contains(".js"))
             {
                 fileStatusStrip.Text = " JS Файл ";
                 SelectedPageTextBox().Language = Language.JS;
             }
-            if (_filePath.Contains(".xml"))
+            if (tabPage.Text.Contains(".xml"))
             {
                 fileStatusStrip.Text = "XML Файл";
                 SelectedPageTextBox().Language = Language.XML;
             }
-            if (_filePath.Contains(".html"))
+            if (tabPage.Text.Contains(".html"))
             {
                 fileStatusStrip.Text = "HTML Файл";
                 SelectedPageTextBox().Language = Language.HTML;
             }
-            if (_filePath.Contains(".json"))
+            if (tabPage.Text.Contains(".json"))
             {
                 SelectedPageTextBox().Language = Language.JSON;
                 fileStatusStrip.Text = "JSON Файл";
             }
-            if (_filePath.Contains(".php"))
+            if (tabPage.Text.Contains(".php"))
             {
                 fileStatusStrip.Text = "PHP Файл";
                 SelectedPageTextBox().Language = Language.PHP;
             }
-            if (_filePath.Contains(".rtf"))
+            if (tabPage.Text.Contains(".rtf"))
             {
                 fileStatusStrip.Text = "RTF Файл";
                 SelectedPageTextBox().Language = Language.Custom;
             }
-            if (_filePath.Contains(".docx"))
+            if (tabPage.Text.Contains(".docx"))
             {
                 fileStatusStrip.Text = "DOCX Файл";
                 SelectedPageTextBox().Language = Language.Custom;
             }
-            if (_filePath.Contains(".py"))
+            if (tabPage.Text.Contains(".py"))
             {
                 fileStatusStrip.Text = "Python Файл";
                 SelectedPageTextBox().Language = Language.JS;
@@ -229,7 +225,7 @@ namespace NotepadPlusPlus
                     Text = $@"{_filePath} NotePad (PeerGrade Version)";
                     // Добавляю в список недавних открытых файлов
                     _openedFilesList.Add(_filePath);
-                    File.AppendAllText("DataHistoryEditor.txt", _filePath + Environment.NewLine);
+                    File.AppendAllText("DataHistoryDeveloperEditor.txt", _filePath + Environment.NewLine);
                 }
             }
             catch (Exception exception)
@@ -267,7 +263,7 @@ namespace NotepadPlusPlus
                                 FileSaveFunction(tabpage.AccessibleDescription);
                                 _filePath = tabpage.AccessibleDescription;
                                 Text = $@"{_filePath} NotePad (PeerGrade Version)";
-                                File.AppendAllText("DataHistoryEditor.txt", _filePath + Environment.NewLine);
+                                File.AppendAllText("DataHistoryDeveloperEditor.txt", _filePath + Environment.NewLine);
                             }
                             else if (saveFileDialog1.ShowDialog() == DialogResult.OK)
                             {
@@ -279,7 +275,7 @@ namespace NotepadPlusPlus
                                 tabpage.AccessibleDescription = openFile.FileName;
 
                                 _openedFilesList.Add(_filePath);
-                                File.AppendAllText("DataHistoryEditor.txt", _filePath + Environment.NewLine);
+                                File.AppendAllText("DataHistoryDeveloperEditor.txt", _filePath + Environment.NewLine);
                             }
                         }
                         else if (dg == DialogResult.Cancel)
@@ -301,7 +297,7 @@ namespace NotepadPlusPlus
                         openFile.FileName = saveFile.FileName;
                         tb.Text = openFile.SafeFileName;
                         _filePath = openFile.FileName;
-                        File.AppendAllText("DataHistoryEditor.txt", _filePath + Environment.NewLine);
+                        File.AppendAllText("DataHistoryDeveloperEditor.txt", _filePath + Environment.NewLine);
                         _openedFilesList.Add(_filePath);
                         tb.AccessibleDescription = openFile.FileName;
                     }
@@ -336,7 +332,7 @@ namespace NotepadPlusPlus
                             openFile.FileName = saveFileDialog1.FileName;
                             tabPage.Text = openFile.SafeFileName;
                             tabPage.AccessibleDescription = saveFileDialog1.FileName;
-                            File.AppendAllText("DataHistoryEditor.txt", _filePath + Environment.NewLine);
+                            File.AppendAllText("DataHistoryDeveloperEditor.txt", _filePath + Environment.NewLine);
                         }
                     }
                     else
@@ -346,7 +342,7 @@ namespace NotepadPlusPlus
                         Text = $@"{tabPage.AccessibleDescription} NotePad (PeerGrade Version)";
                         openFile.FileName = tabPage.AccessibleDescription;
                         tabPage.Text = openFile.SafeFileName;
-                        File.AppendAllText("DataHistoryEditor.txt", _filePath + Environment.NewLine);
+                        File.AppendAllText("DataHistoryDeveloperEditor.txt", _filePath + Environment.NewLine);
                     }
                 }
             }
@@ -636,6 +632,15 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
 
                         tabOption.TabPages.Remove(tabpage);
                         TabOption_SelectedIndexChanged(sender, e);
+                        IEnumerable<string> sent = new[] {string.Empty};
+                        string[] arrPages = File.ReadAllLines("DataHistoryDeveloperEditor.txt");
+                        for (int i = 0; i < arrPages.Length; i++)
+                        {
+                            sent = arrPages[i].Split(' ')
+                                .Distinct(StringComparer.CurrentCultureIgnoreCase);
+                        }
+                        File.WriteAllLines("DataHistoryDeveloperEditor.txt", sent);
+                        File.AppendAllText("DataHistoryDeveloperEditor.txt", _filePath + Environment.NewLine);
                     }
                 }
                 File.AppendAllText("DebugLog.txt", $"[{DateTime.UtcNow}] Closing DeveloperEditor {Environment.NewLine}");
@@ -646,7 +651,7 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
             }
         }
 
-      
+
 
         void TimerStart()
         {
@@ -665,29 +670,45 @@ createEmail(""your@gmail.com"", ""client@gmail.com"", ""Hello"", ""How are you ?
             {
                 fcbTextBox.ContextMenuStrip = contextOption;
                 tabOption.ContextMenuStrip = contextTabMenuStrip;
-                string[] arrPages = File.ReadAllLines("DataHistoryDeveloperEditor.txt");
-                if (arrPages.Length >= 1)
+                string path = "DataHistoryDeveloperEditor.txt";
+                string debugLog = "DebugLog.txt";
+                if (!File.Exists(path))
+                    File.Create(path);
+                else
                 {
-                    for (int i = 0; i < arrPages.Length; i++)
+                    string[] arrPages = File.ReadAllLines("DataHistoryDeveloperEditor.txt");
+                    if (arrPages.Length >= 1)
                     {
-                        TabPage tabpage = new TabPage();
-                        FastColoredTextBox fctText = new FastColoredTextBox { Dock = DockStyle.Fill, BorderStyle = BorderStyle.None };
-                        var sent = arrPages[i].Trim(' ').Split(' ').Distinct(StringComparer.CurrentCultureIgnoreCase);
-                        File.WriteAllLines("DataHistoryDeveloperEditor.txt", sent);
-                        openFile.FileName = arrPages[i];
-                        if (openFile.CheckFileExists)
+                        for (int i = 0; i < arrPages.Length; i++)
                         {
-                            tabOption.SelectedTab = tabpage;
-                            tabOption.TabPages.Add(tabpage);
-                            tabpage.Controls.Add(fctText);
-                            tabpage.ContextMenuStrip = contextOption;
-                            fctText.Text = File.ReadAllText(arrPages[i]);
-                            tabpage.Text = openFile.SafeFileName;
-                            StatusFileDetector();
+                            TabPage tabpage = new TabPage();
+                            FastColoredTextBox fctText = new FastColoredTextBox
+                            { Dock = DockStyle.Fill, BorderStyle = BorderStyle.None };
+                            var sent = arrPages[i].Trim(' ').Split(' ')
+                                .Distinct(StringComparer.CurrentCultureIgnoreCase);
+                            File.WriteAllLines("DataHistoryDeveloperEditor.txt", sent);
+                            openFile.FileName = arrPages[i];
+                            if (openFile.CheckFileExists)
+                            {
+                                tabOption.SelectedTab = tabpage;
+                                tabOption.TabPages.Add(tabpage);
+                                tabpage.Controls.Add(fctText);
+                                tabpage.ContextMenuStrip = contextOption;
+                                fctText.Text = File.ReadAllText(arrPages[i]);
+                                tabpage.Text = openFile.SafeFileName;
+                                StatusFileDetector();
+                            }
                         }
                     }
+
+                    if (File.Exists(debugLog))
+                        File.AppendAllText("DebugLog.txt", $"[{DateTime.UtcNow}] Opening DeveloperEditor {Environment.NewLine}");
+                    else
+                    {
+                        File.Create(debugLog);
+                        File.AppendAllText("DebugLog.txt", $"[{DateTime.UtcNow}] Opening DeveloperEditor {Environment.NewLine}");
+                    }
                 }
-                File.AppendAllText("DebugLog.txt", $"[{DateTime.UtcNow}] Opening DeveloperEditor {Environment.NewLine}");
             }
             catch (Exception exception)
             {
