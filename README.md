@@ -1,6 +1,6 @@
 # NotepadPlusPlus
 
-This project is created using Windows Forms (.NET). Source code
+This project was created by using Windows Forms (.NET). Source code
 editor and Notepad replacement that supports several programming languages and
 natural languages. 
 
